@@ -41,6 +41,10 @@ def recognize_type(bytes_per_pix, is_signed, is_float=False):
             raise ValueError('Invalid type declared!')
 
 
+def read_header(filename):
+    pass
+
+
 def read_binary(filename, width, height, frames, bytes_per_pix=2, is_signed=False, is_float=False, byte_order=''):
     """
     :param filename: Name of the file to be read.
@@ -63,7 +67,9 @@ def read_binary(filename, width, height, frames, bytes_per_pix=2, is_signed=Fals
     with open(filename, "rb") as f:
         byte_list = f.read()
     if total_pix != len(byte_list) // bytes_per_pix:
-        raise IOError('The given image dimensions and encoding does not match given data!')
+        raise IOError('The given image dimensions and encoding does not match given data!'\
+                      + '\n\t>\tTotal number of pixels declared: '+str(total_pix)\
+                      + '\n\t>\tEstimation from file: '+str(len(byte_list) // bytes_per_pix))
 
     # decoding depends on whether data is float or not
     if is_float:
@@ -75,7 +81,9 @@ def read_binary(filename, width, height, frames, bytes_per_pix=2, is_signed=Fals
         for pix_no in range(0, total_pix):
             values.append(int.from_bytes(byte_list[bytes_per_pix * pix_no: (bytes_per_pix * (pix_no + 1))], \
                                            byteorder=byte_order_local, signed=is_signed))
-    return np.asarray(values).reshape((frames, width, height))
+    resh_arr = np.asarray(values).reshape((frames, width, height))
+    print('Reading complete!')
+    return resh_arr
 
 
 def write_dicom(filename, pixel_array,  bytes_per_pix=2, is_signed=False, is_float=False):
@@ -152,12 +160,26 @@ def write_dicom(filename, pixel_array,  bytes_per_pix=2, is_signed=False, is_flo
         ds.PixelData = pixel_array.tostring()
 
         ds.save_as(filename)
+        print('Writing complete!')
         return True
     except ValueError as ve:
         print(err_str+str(ve))
         return False
     except Exception as e:
         print(err_str+str(e))
+
+
+def get_help():
+    print('#'*50)
+    print('This is a binary -> DICOM converter created by Rafal Maselek.')
+    print('Usage:')
+    print("python binary2DICOM.py <arguments>")
+    print("Required arguments:")
+    print("\t<input file name (str)>\n\t<output file name (str)>\n\t<image width (int)>\n\t<image height(int)>\n\t<no. of frames (int)>")
+    print("Optional arguments:")
+    print("\t<bytes per pixel(int)>\n\t<is it signed int (1/0)>\n\t<is it float (1/0)>\n\t<endian type> (big/little)")
+    print('In order to create dummy files (2D or 3D gradient images) type: \npython3 binary2DICOM --test2d OR python3 binary2DICOM --test3d')
+    print('#'*50)
 
 
 def test2d():
@@ -194,21 +216,36 @@ if __name__ == "__main__":
     is_signed = False
     is_float = False
     byte_order = ''
-    sys_len = len(sys.argv)
-    if sys_len >= 7:
-        bytes_per_pix = int(sys.argv[6])
-    if sys_len >= 8:
-        is_signed = bool(sys.argv[7])
-    if sys_len >= 9:
-        is_float = bool(sys.argv[8])
-    if sys_len == 10:
-        byte_order = sys.argv[9]
-    if sys_len > 10:
-        print("WARNING: Too many arguments passed. Additional arguments will be omitted.")
+    result = True
+    # Checking user's input
+    if(sys.argv[1][:2] == '--'):
+        # print(sys.argv[1])
+        if sys.argv[1][2:] == 'test2d':
+            result = test2d()
+        elif sys.argv[1][2:] == 'test3d':
+            result = test3d()
+        elif sys.argv == 'help':
+            get_help()
+        else:
+            print("Unrecognized first argument!")
+    else:
+        sys_len = len(sys.argv)
+        if sys_len < 6:
+            get_help()
+        if sys_len >= 7:
+            bytes_per_pix = int(sys.argv[6])
+        if sys_len >= 8:
+            is_signed = bool(sys.argv[7])
+        if sys_len >= 9:
+            is_float = bool(sys.argv[8])
+        if sys_len == 10:
+            byte_order = sys.argv[9]
+        if sys_len > 10:
+            print("WARNING: Too many arguments passed. Additional arguments will be omitted.")
 
-    result = convert(sys.argv[1], sys.argv[2], int(sys.argv[3]), int(sys.argv[4]), int(sys.argv[5]),\
-                     bytes_per_pix, is_signed, is_float, '')
-    # result = test3d()
+        # Performing conversion
+        result = convert(sys.argv[1], sys.argv[2], int(sys.argv[3]), int(sys.argv[4]), int(sys.argv[5]),\
+                         bytes_per_pix, is_signed, is_float, '')
 
     if result:
         print('Action complete!')

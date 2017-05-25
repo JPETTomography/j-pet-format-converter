@@ -1,0 +1,14 @@
+# Example file with meta-data to be written in a new DICOM file.
+# You have to specify: group tag, element tag, VR and value.
+# All these elements have to be separated using comma.
+# String values need to be inside '' characters.
+# Dot is used as a decimal delimiter.
+# You can write comments using hash symbol -- everything after it is ignored.
+# YOU are responsible for providing correct values, DICOM is a very complicated file format and no warranty can be granted.
+##################
+0010,  0010,  PN , 'Rafal M.' #PatientName
+0010, 0040,  CS, 'M'  #PatientSex
+0010  , 1010  ,  AS,  '023Y'    #PatientAge
+0010,1030, DS, 77.5   #PatientWeight
+0010,0030, DA, '19900101'    #PatientBirthDate
+

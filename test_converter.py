@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 import binary2DICOM as b2d
 import numpy as np
 
@@ -16,7 +17,7 @@ class MakeGradientTest(unittest.TestCase):
         x = np.arange(16).reshape(16,1) # tworzymy gradient 1D
         pixel_array = (x + x.T) * 16 # z tablicy robimy gradient 2D i wygladzamy
         pixel_array = np.tile(pixel_array,(4,4)) # powielamy 4 razy wzdluz X i Y
-        b2d.write_dicom({'out_file':'pretty2d.dcm', 'bytes_per_pix':1, 'is_signed':False, 'is_float':False}, pixel_array)
+        b2d.write_dicom({'out_file':'pretty2d.dcm', 'bytes_per_pix':2, 'is_signed':False, 'is_float':False}, pixel_array)
         self.assertTrue(True)
 
     def test_make_gradient_3d(self):
@@ -28,7 +29,7 @@ class MakeGradientTest(unittest.TestCase):
         x = np.arange(16).reshape(16, 1)  # tworzymy gradient 1D
         pixel_array = (x + x.T) * 16  # z tablicy robimy gradient 2D i wygladzamy
         pixel_array = np.tile(pixel_array, (4, 4, 4))
-        b2d.write_dicom({'out_file':'pretty2d.dcm', 'bytes_per_pix':1, 'is_signed':False, 'is_float':False}, pixel_array)
+        b2d.write_dicom({'out_file':'pretty3d.dcm', 'bytes_per_pix':2, 'is_signed':False, 'is_float':False}, pixel_array)
         self.assertTrue(True)
 
 

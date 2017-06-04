@@ -1,0 +1,4 @@
+numpy
+pyDicom
+pylint
+python-coveralls

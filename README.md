@@ -1,25 +1,97 @@
 # j-pet-format-converter
-##version 1.1
-### Author: Rafal Maselek
+##version 1.2
+### Author: Rafał Masełek
 ### Email: rafal.maselek@ncbj.gov.pl
 
 This script enables converting raw 3D binary images to DICOM file format and importing meta-data from external file.
 
+### Installation:
 **Prerequisites:**
-+ Python 3
-+ Numpy 
-+ pyDicom
++ Python (vers. 3.X.X recommended)
++ Numpy  (python library)
++ pyDicom (python library)
 
+If you use Debian/Ubuntu/Linux Mint you can install python3 using 'apt-get install' command:
+>sudo apt-get install python3
+
+If you use Mac OS X and have Homebrew installed, you can type:
+>sudo brew install python3
+
+If you don't have brew, then get it using the following command:
+
+>/usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+
+It might be required to run it in 'sudo' mode.
+
+This will require providing root's (system administrator's) password. Python3 can be safely installed alongside python2, which is still (unfortunately) the default
+python distribution on many Linux systems.
+
+Additional python libraries can be installed using 'pip3' application, which is installed with python3.
+Simply run the following commands in the terminal:
+>pip3 install numpy \
+>pip3 install pydicom
+
+### Usage:
 To learn how to use script simply download it and run in terminal:
 >python3 binary2DICOM --help
 
+**Usage example:**
+This is an example command used to convert Gate output to DICOM format.
+>python3 binary2DICOM.py --meta meta.txt collimator_20 collimator_20-conv.dcm 256 256 256 -bpp 4 -int -bo little
++ **python3 binary2DICOM.py** uses python3 to run the script
++ **--meta meta.txt** specifies that external file with meta data is used; it is called 'meta.txt' and is located in the same directory as the binary2DICOM.py script
++ **collimator_20** name of the binary image -- input file
++ **collimator_20-conv.dcm** name of the output file, note the '.dcm' extension
++ **256 256 256** X, Y and Z(no of frames) dimensions of encoded images (size in pixels)
++ **-bpp 4** defines that 4 bytes were used to encode every pixel of input data (if you don't know encoding type, then ask the maker of the input file)
++ **-int** specifies that signed integers were used to encode input image (use '-uint' for unsigned integers)
++ **-bo little** specifies the byte order used to encode binary image; supported are **little/big**
+
+Not all parameters are necessary, optional ones havedefault values. You can get more information by using **--help** flag.
+
+### Supported encodings:
 The script is capable of reading binary images encoded using signed or unsigned integers, 1/2/4/8 bytes per pixel.
+In the future it might be developed to manage file encoded using floating point numbers.
 
+### External meta data file:
 External file with metadata must have apropriate format (see meta.txt):
-You have to specify: group tag, element tag, VR and value.
+You have to specify: **group tag**, **element tag**, **VR** and **value**.
 All these elements have to be separated using comma.
-String values need to be inside '' characters.
+String values need to be inside **'** characters.
 Dot is used as a decimal delimiter.
-You can write comments using hash symbol -- following characters are ignored.
+You can write comments using hash symbol (#) -- following characters are ignored.
+
+### Using binary2DICOM as module:
+The script can be used as a python module in external program. To use it you have to import binary2DICOM to your script:
+>from binary2DICOM import convert
+
+Then you have to call convert() method, providing special dictionary as an argument.
+The dictionary must have the following structure:
 
 
+{'meta': (meta_data_file_path, STRING),\
+'in_file': (input_data_file_path, STRING),\
+'out_file': (output_data_file_path, STRING),\
+'width': (INT),\
+'height': (INT),\
+'frames': (INT),\
+'is_signed': (BOOL),\
+'byte_order': ('little' OR 'big'),\
+'bytes_per_pix': (INT),\
+'is_float': (BOOL)}
+    
+Key-value pairs in the dictionary correspond to input parameters.
+You code should look like this:
+>convert({'meta': 'meta.txt', 'width': 256, 'is_signed': True, 'in_file': 'collimator_20', 'byte_order': 'little', 'height': 256, 'frames': 256, 'bytes_per_pix': 4, 'out_file': 'collimator_20-conv.dcm', 'is_float': False})
+
+Of course you can store dictionary in a variable and pass this variable to the convert function.
+### Viewing the results:
+There are many applications to visualize images in DICOM files. Personally, I recommend using Amide:
+
+http://amide.sourceforge.net/
+
+To open a .dcm file use the FILE menu:\
+File > Import File(specify) > DICOM 3.0 via (X)MedCon.
+
+It uses a very useful tool called (X)MedCon, which can be downloaded from repositories and used alone to open DICOM files
+(but Amide provides better visualization).

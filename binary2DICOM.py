@@ -10,9 +10,8 @@ from dicom.dataset import Dataset, FileDataset
 import numpy as np
 import datetime, time
 import argparse
-
-version_str = "version 1.1 features included:\n\t1)Reading raw binary file with image\n\t2)Reading file with meta-data\n\t3)Creating\
- a new DICOM file\n\t4)Reading image parameters from meta-data\n\t5)Smart argument parser"
+binary2DICOM_version = "version 1.2 features included:\n\t1)Reading raw binary file with image\n\t2)Reading file with meta-data\n\t3)Creating\
+ a new DICOM file\n\t4)Reading image parameters from meta-data\n\t5)Smart argument parser\n\t6)Using converter as a module"
 
 
 def recognize_type(bytes_per_pix, is_signed, is_float=False):
@@ -80,7 +79,6 @@ def read_meta(filename):
                     else:
                         # parse as int
                         line_data.append(int(val))
-                    # print(line_data)
                     meta_arr.append(line_data)
 
                 except ValueError as e:
@@ -232,7 +230,10 @@ def write_dicom(arguments, pixel_array, meta_arr = []):
 def convert(arguments):
     """
     Calls functions to read binary image and write it (with meta data) to a new DICOM file.
-    :param arguments: Dictionary containing input parameters.
+    :param arguments: Dictionary containing input parameters. 
+    {'meta': <META DATA FILE, STRING>, 'in_file': <INPUT FILE, STRING>, 'out_file': <OUTPUT FILE, STRING>,
+    'width': <INT>, 'height': <INT>, 'frames': <INT>,
+    'is_signed': <BOOL>,  'byte_order': <'little' OR 'big'>,  'bytes_per_pix': <INT>,  'is_float': <BOOL>}
     :return: 
     """
     meta_arr = []
@@ -267,8 +268,8 @@ def main():
     parser.add_argument('-bo', '--byte_order', metavar='byte_order', type=str, nargs='?', default='system', choices=['little', 'big'],\
                         help='ENDIAN type (little/big)')
     parser.add_argument('-m', '--meta', help='use external meta data', type=str, nargs='?', default='')
-    parser.add_argument('-v', '--version', action='version', version=version_str)
-    # parser.set_defaults(is_signed=True, is_float=False)
+    parser.add_argument('-v', '--version', action='version', version=binary2DICOM_version)
+
     try:
         args = parser.parse_args()
         args_dict = vars(args)
@@ -288,6 +289,7 @@ def main():
     print('[INFO] Parsed arguments:')
     print(args_dict)
     convert(args_dict)
+
 
 if __name__ == "__main__":
     main()

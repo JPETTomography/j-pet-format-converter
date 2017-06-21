@@ -36,7 +36,7 @@ To get the necessary libraries, simply run the following commands in the termina
 If you have any of the requirements already installed, you will receive a message informing you about it. You can then proceed to the next step.
 
 ### Usage:
-To learn how to use script simply download it and run in terminal:
+To learn how to use script simply download the repository and run in terminal:
 >python3 binary2DICOM.py --help
 
 **Usage example:**
@@ -90,7 +90,7 @@ You code should look like this:
 
 ```convert({'meta': 'meta.txt', 'width': 256, 'is_signed': True, 'in_file': 'collimator_20', 'byte_order': 'little', 'height': 256, 'frames': 256, 'bytes_per_pix': 4, 'out_file': 'collimator_20-conv.dcm', 'is_float': False})```
 
-Of course you can store dictionary in a variable and pass this variable to the convert function.
+Of course you can store dictionary in a variable and pass this variable to the *convert()* function.
 ### Viewing the results:
 There are many applications to visualize images in DICOM files. Personally, I recommend using Amide:
 
@@ -99,5 +99,14 @@ http://amide.sourceforge.net/
 To open a .dcm file use the FILE menu:\
 File > Import File(specify) > DICOM 3.0 via (X)MedCon.
 
-It uses a very useful tool called (X)MedCon, which can be downloaded from repositories and used alone to open DICOM files
+Amide uses a very useful tool called [(X)MedCon](http://xmedcon.sourceforge.net/),
+which can be downloaded from project's website or system's repositories, and it can be used alone to open DICOM files
 (but Amide provides better visualization).
+
+To install (X)MedCon on Debian/Ubuntu/Linux Mint from repositories:
+>sudo apt-get install xmedcon
+
+In order to open DICOM file from Terminal, use command:
+>xmedcon -f name_of_file.dcm
+
+(X)MedCon has many other options and supported formats, see project's documentation for details.

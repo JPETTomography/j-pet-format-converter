@@ -1,5 +1,5 @@
 # j-pet-format-converter
-##version 1.2
+## version 1.2
 ### Author: Rafał Masełek
 ### Email: rafal.maselek@ncbj.gov.pl
 
@@ -24,7 +24,7 @@ sudo /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/i
 This will require providing root's (system administrator's) password. Python3 can be safely installed alongside python2, which is still (unfortunately) the default
 python distribution on many Linux systems.
 
-Additional python libraries can be installed using 'pip3' application, which should be installed with python3 from version 3.4
+Additional python libraries can be installed using 'pip3' application, which should be installed with python3 from version 3.4.
 If you do not have it, you can install it by running:
 >sudo apt-get install python3-pip 
 

@@ -17,37 +17,42 @@ If you use Debian/Ubuntu/Linux Mint you can install python3 using 'apt-get insta
 If you use Mac OS X and have Homebrew installed, you can type:
 >sudo brew install python3
 
-If you don't have brew, then get it using the following command:
+If you don't have Homebrew, then get it using the following command:
 
->/usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
-
-It might be required to run it in 'sudo' mode.
+sudo /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
 
 This will require providing root's (system administrator's) password. Python3 can be safely installed alongside python2, which is still (unfortunately) the default
 python distribution on many Linux systems.
 
-Additional python libraries can be installed using 'pip3' application, which is installed with python3.
-Simply run the following commands in the terminal:
->pip3 install numpy \
->pip3 install pydicom
+Additional python libraries can be installed using 'pip3' application, which should be installed with python3 from version 3.4
+If you do not have it, you can install it by running:
+>sudo apt-get install python3-pip 
+
+To get the necessary libraries, simply run the following commands in the terminal:
+>sudo pip3 install numpy
+
+>sudo pip3 install pydicom
+
+If you have any of the requirements already installed, you will receive a message informing you about it. You can then proceed to the next step.
 
 ### Usage:
 To learn how to use script simply download it and run in terminal:
->python3 binary2DICOM --help
+>python3 binary2DICOM.py --help
 
 **Usage example:**
 This is an example command used to convert Gate output to DICOM format.
+File with simulated data is called in this example **collimator_20**.
 >python3 binary2DICOM.py --meta meta.txt collimator_20 collimator_20-conv.dcm 256 256 256 -bpp 4 -int -bo little
 + **python3 binary2DICOM.py** uses python3 to run the script
 + **--meta meta.txt** specifies that external file with meta data is used; it is called 'meta.txt' and is located in the same directory as the binary2DICOM.py script
-+ **collimator_20** name of the binary image -- input file
++ **collimator_20** name of the binary image file (input file for script)
 + **collimator_20-conv.dcm** name of the output file, note the '.dcm' extension
 + **256 256 256** X, Y and Z(no of frames) dimensions of encoded images (size in pixels)
 + **-bpp 4** defines that 4 bytes were used to encode every pixel of input data (if you don't know encoding type, then ask the maker of the input file)
 + **-int** specifies that signed integers were used to encode input image (use '-uint' for unsigned integers)
 + **-bo little** specifies the byte order used to encode binary image; supported are **little/big**
 
-Not all parameters are necessary, optional ones havedefault values. You can get more information by using **--help** flag.
+Not all parameters are necessary, optional ones have default values. You can get more information by using **--help** flag.
 
 ### Supported encodings:
 The script is capable of reading binary images encoded using signed or unsigned integers, 1/2/4/8 bytes per pixel.
@@ -82,7 +87,8 @@ The dictionary must have the following structure:
     
 Key-value pairs in the dictionary correspond to input parameters.
 You code should look like this:
->convert({'meta': 'meta.txt', 'width': 256, 'is_signed': True, 'in_file': 'collimator_20', 'byte_order': 'little', 'height': 256, 'frames': 256, 'bytes_per_pix': 4, 'out_file': 'collimator_20-conv.dcm', 'is_float': False})
+
+```convert({'meta': 'meta.txt', 'width': 256, 'is_signed': True, 'in_file': 'collimator_20', 'byte_order': 'little', 'height': 256, 'frames': 256, 'bytes_per_pix': 4, 'out_file': 'collimator_20-conv.dcm', 'is_float': False})```
 
 Of course you can store dictionary in a variable and pass this variable to the convert function.
 ### Viewing the results:

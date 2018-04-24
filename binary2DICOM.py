@@ -7,10 +7,9 @@
 
 import sys
 try:
-  from dicom.dataset import Dataset, FileDataset
-except ImportError:
-  print("import dicom failed, trying import pydicom") 
   from pydicom.dataset import Dataset, FileDataset
+except ImportError:
+  from dicom.dataset import Dataset, FileDataset
 
 import datetime
 import time

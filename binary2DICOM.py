@@ -6,11 +6,17 @@
 # This script enables converting raw 3D binary images to DICOM file format and importing meta-data from external file.
 
 import sys
-from dicom.dataset import Dataset, FileDataset
-import numpy as np
-import datetime, time
+try:
+  from dicom.dataset import Dataset, FileDataset
+except ImportError:
+  print("import dicom failed, trying import pydicom") 
+  from pydicom.dataset import Dataset, FileDataset
+
+import datetime
+import time
 import argparse
-binary2DICOM_version = "version 1.2 features included:\n\t1)Reading raw binary file with image\n\t2)Reading file with meta-data\n\t3)Creating\
+import numpy as np
+binary2DICOM_version = "version 1.3 features included:\n\t1)Reading raw binary file with image\n\t2)Reading file with meta-data\n\t3)Creating\
  a new DICOM file\n\t4)Reading image parameters from meta-data\n\t5)Smart argument parser\n\t6)Using converter as a module"
 
 

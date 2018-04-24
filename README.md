@@ -1,7 +1,8 @@
 # j-pet-format-converter
-## version 1.2
+## version 1.3
 ### Author: Rafał Masełek
 ### Email: rafal.maselek@ncbj.gov.pl
+### Modifications: Wojciech Krzemien 
 
 This script enables converting raw 3D binary images to DICOM file format and importing meta-data from external file.
 

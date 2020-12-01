@@ -1,0 +1,35 @@
+!INTERFILE := 
+!imaging modality := PET
+!version of keys := CASToRv3.1
+CASToR version := 3.1
+
+!GENERAL DATA := 
+!originating system := BARREL1
+!data offset in bytes := 0
+!name of data file := recon_3_1_it3.img
+patient name := recon_3_1_it3
+
+!GENERAL IMAGE DATA 
+!type of data := Dynamic
+!total number of images := 200
+imagedata byte order := LITTLEENDIAN
+!number of frame groups := 1 
+process status := 
+
+!STATIC STUDY (General) :=
+number of dimensions := 3
+!matrix size [1] := 160
+!matrix size [2] := 160
+!matrix size [3] := 200
+!number format := short float
+!number of bytes per pixel := 4
+scaling factor (mm/pixel) [1] := 2.5
+scaling factor (mm/pixel) [2] := 2.5
+scaling factor (mm/pixel) [3] := 2.5
+first pixel offset (mm) [1] := 0
+first pixel offset (mm) [2] := 0
+first pixel offset (mm) [3] := 0
+data rescale offset := 0
+data rescale slope := 1
+quantification units := 1
+!END OF INTERFILE := 

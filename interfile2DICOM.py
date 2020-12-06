@@ -11,40 +11,41 @@ import binary2DICOM as b2d
 Reads Interfile header file.
 
 :param filename: name of the header file
-:returns: dictionary containing header data 
+:returns: dictionary containing header data or ValueError in case of incorrect argument
 
 """
 def readHeader(filename):
 
 	meta_dict = {}
 
-	with open(filename,"r") as f:
+	try:
+		with open(filename,"r") as f:
 
-		start_line = f.readline()
+			start_line = f.readline()
 
-		if start_line == "!INTERFILE := \n":
+			if start_line == "!INTERFILE := \n":
 
-			bufor = f.readlines()
+				bufor = f.readlines()
 
-			for line in bufor:
-				line = line.strip('!\n')
-				line = line.split(' := ')
-				if line[0] != '':
-					if "end" in line[0].lower():
-						return meta_dict
-					elif "general" not in line[0].lower() :
-						meta_dict[line[0]] = line[1]
+				for line in bufor:
+					line = line.strip('!\n')
+					line = line.split(' := ')
+					if line[0] != '':
+						if "end" in line[0].lower():
+							return meta_dict
+						elif "general" not in line[0].lower() :
+							meta_dict[line[0]] = line[1]
 
+				print("ERROR! COULDN'T FIND END OF INTERFILE HEADER KEY!")
+				raise ValueError
 
-			print("ERROR! COULDN'T FIND END OF INTERFILE HEADER KEY!")
-			sys.exit(1)
+			else:
+				print("ERROR! COULDN'T FIND START OF INTERFILE HEADER KEY!")
+				raise ValueError
 
-		else:
-			print("ERROR! COULDN'T FIND START OF INTERFILE HEADER KEY!")
-			sys.exit(1)
-
-	print("ERROR! INVALID FILE!")
-	sys.exit(1)
+	except FileNotFoundError:
+		print("ERROR! INVALID FILENAME!")
+		raise ValueError
 
 """
 Recognizes data type taken from a header file
@@ -57,11 +58,15 @@ def recognizeTypeInterfile(bytes_per_pix,type):
 	isSigned = lambda var_type: "unsigned" not in var_type
 	isFloat = lambda var_type: "float" in var_type
 
+	if type not in ["int","unsigned int", "float", "unsigned float"]:
+		print("ERROR! WRONG TYPE INPUT!")
+		raise ValueError
+
 	try:
 		bytes_per_pix = int(bytes_per_pix)
 	except ValueError:
-		print("ERROR! GOT",type(bytes_per_pix),"INSTEAD OF INT!")
-		sys.exit(1)
+		print("ERROR! GOT INCORRECT BYTES PER PIX INPUT!")
+		raise ValueError
 
 	return b2d.recognize_type(bytes_per_pix,isSigned(type),isFloat(type))
 

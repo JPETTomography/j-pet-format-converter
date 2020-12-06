@@ -1,46 +1,80 @@
 import interfile2DICOM as i2d
+import os
 import unittest
+import numpy as np
 
 class HeaderTest(unittest.TestCase):
 
-	def readHeader_test(self):
+	def test_readHeader(self):
 
-		correct_text = "!INTERFILE := \n!test key := test_valu\n!END OF INTERFILE := "
-		error1_text = "test"
-		error2_text = "!INTERFILE := \n test"
+		print("\n")
 
-		f = open("test.hdr","wb")
-		f.write(correct_text)
-		f.close()
+		correct_start = "!INTERFILE := \n"
+		correct_key = "!test_key := test_value\n"
+		correct_end = "!END OF INTERFILE := "
 
-		try:
-			d = readHeader("test.hdr")
-		except SystemExit:
-			self.fail("ERROR! readHeader() RAISED AN ERROR WITH CORRECT FILE")
-
-		if d['test key'] != 'test_value':
-			self.fail("ERROR! WRONG VALUE BINDED TO KEY IN readHeader()")
-
-		f = open("test.hdr","wb")
-		f.write(error1_text)
-		f.close()
+		with open("test.hdr","w") as f:
+			f.write(correct_start)
+			f.write(correct_key)
+			f.write(correct_end)
 
 		try:
-			d = readHeader("test.hdr")
-			self.fail("ERROR! readHeader() DID NOT RAISED AN ERROR WITH INCORRECT FILE")
-		except SystemExit:
-			print("TASK FAILED SUCCESSFULLY")
+			d = i2d.readHeader("test.hdr")
+		except ValueError:
+			self.fail("ERROR! readHeader() THREW ValueError WITH CORRECT DATA")
+		
+		self.assertEqual(d["test_key"],"test_value","ERROR! WRONG VALUE BINDED TO KEY IN readHeader()")
 
-		f = open("test.hdr","wb")
-		f.write(error2_text)
-		f.close()
+		with open("test1.hdr","w") as f:
+				f.write(correct_key)
 
-		try:
-			d = readHeader("test.hdr")
-			self.fail("ERROR! readHeader() DID NOT RAISED AN ERROR WITH INCORRECT FILE")
-		except SystemExit:
-			print("TASK FAILED SUCCESSFULLY")
+		with open("test2.hdr","w") as f:
+				f.write(correct_start)
 
+		with self.assertRaises(ValueError):
+			print("TESTING INCORRECT FILENAME:")
+			d = i2d.readHeader("t")
+
+		with self.assertRaises(ValueError):
+			print("TESTING INCORRECT INTERFILE START:")
+			d = i2d.readHeader("test1.hdr")
+
+		with self.assertRaises(ValueError):
+			print("TESTING INCORRECT INTERFILE END:")
+			d = i2d.readHeader("test2.hdr")
+
+		os.remove("test.hdr")
+		os.remove("test1.hdr")
+		os.remove("test2.hdr")
+
+	def test_recognizeTypeInterfile(self):
+
+		print("\n")
+
+		type1 = "unsigned int"
+		type2 = "int"
+		type3 = "a"
+
+		bytes1 = 8
+		bytes2 = -1
+		bytes3 = "error"
+
+		test = lambda t,b: i2d.recognizeTypeInterfile(t,b)
+
+		self.assertEqual(test(bytes1,type1),np.uint64)
+		self.assertEqual(test(bytes1,type2),np.int64)
+
+		with self.assertRaises(ValueError):
+			print("TESTING INCORRECT TYPE:")
+			x = test(bytes1,type3)
+
+		with self.assertRaises(ValueError):
+			print("TESTING INCORRECT BYTES PER PIXEL NUMBER:")
+			x = test(bytes2,type1)
+
+		with self.assertRaises(ValueError):
+			print("TESTING INCORRECT BYTES PER PIXEL INPUT:")
+			x = test(bytes3,type1)
 
 def run_tests():
     unittest.main()

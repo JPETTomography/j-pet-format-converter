@@ -76,6 +76,41 @@ class HeaderTest(unittest.TestCase):
 			print("TESTING INCORRECT BYTES PER PIXEL INPUT:")
 			x = test(bytes3,type1)
 
+	def test_parseHead(self):
+
+		head_dict = {}
+
+		with self.assertRaises(ValueError):
+			print("TESTING EMPTY DICTIONARY:")
+			x = i2d.parseHead(head_dict)
+
+
+		#args_keys = ["in_file","out_file","width","height","frames","bytes_per_pix","is_signed","byte_order"]
+
+
+		head_dict["patient name"] = "x"	
+		head_dict["matrix size [1]"] = 2	
+		head_dict["matrix size [2]"] = 2	
+		head_dict["matrix size [3]"] = 2	
+		head_dict["number of bytes per pixel"] = 8	
+		head_dict["number format"]	= "unsigned"
+		head_dict["imagedata byte order"] = "littlesomething"
+
+		print("TESTING DICTIONARY WITH NO KEYS:")
+		x = i2d.parseHead(head_dict)
+		self.assertEqual(x["width"] , "")
+		self.assertEqual(x["in_file"], "")
+
+		head_dict["name of data file"] = "x"
+		head_dict["number of dimensions"] = 3
+
+		x = i2d.parseHead(head_dict)
+
+		self.assertEqual(x["out_file"], "x")
+		self.assertEqual(x["width"], 2)
+		self.assertEqual(x["is_signed"], False)
+		self.assertEqual(x["byte_order"], "little")
+
 def run_tests():
     unittest.main()
 

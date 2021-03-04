@@ -1,4 +1,5 @@
 import interfile2DICOM as i2d
+import binary2DICOM as b2d
 import os
 import unittest
 import numpy as np
@@ -111,10 +112,21 @@ class HeaderTest(unittest.TestCase):
 		self.assertEqual(x["is_signed"], False)
 		self.assertEqual(x["byte_order"], "little")
 
+	def test_i2d(self):
+		head_dict = i2d.readHeader('recon_3_1_it3.hdr')
+		args_dict = i2d.parseHead(head_dict)
+
+		arr = b2d.read_binary(args_dict)
+
+		meta = i2d.writeMeta(head_dict)
+
+		b2d.write_dicom(args_dict,arr,meta) #writing an invalid file [TODO] FIX IT
+
+
 def run_tests():
     unittest.main()
 
 if __name__ == '__main__':
-    run_tests()
+	run_tests()
 
 

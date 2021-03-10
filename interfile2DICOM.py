@@ -149,9 +149,13 @@ def writeMeta(args):
 	meta_arr.append([0x0010,0x0022,'CS','']) #Type of Patient's ID
 	meta_arr.append([0x0010,0x0030,'DA','']) #Patient's Birth Date
 	meta_arr.append([0x0010,0x0040,'CS','']) #Patient's Sex
+	meta_arr.append([0x0040,0xE020,'CS','DICOM']) #Type of Instances
+	meta_arr.append([0x0008,0x1150,'UI','']) #Referenced SOP Class UID
+	meta_arr.append([0x0008,0x1155,'UI','']) #Referenced SOP Instance UID
 
 
 	#Study [C.7.2.1]
+	meta_arr.append([0x0020,0x000D,'UI','']) #Study Instance UID
 	meta_arr.append([0x0008,0x0018,'UI','']) #SOP Instance UID
 	meta_arr.append([0x0008,0x0020,'DA','']) #Study date
 	meta_arr.append([0x0008,0x0030,'TM','']) #Study time
@@ -164,30 +168,40 @@ def writeMeta(args):
 
 
 	#Equipement [C.8.6.1]
-
+	meta_arr.append([0x0008,0x0064,'CS','']) #Conversion type
 
 	#General Image [C.7.6.1]
 	meta_arr.append([0x0020,0x0013,'IS','']) #Instance Number
 
 	#Image Pixel [C.7.6.3]
-	
+	meta_arr.append([0x7FE0,0x0010,'OB','']) #Pixel Data
+	meta_arr.append([0x0028,0x0002,'US','']) #Samples per pixel
+	meta_arr.append([0x0028,0x0004,'CS','']) #Photometric interpolation
+	meta_arr.append([0x0028,0x0010,'US','']) #Rows
+	meta_arr.append([0x0028,0x0011,'US','']) #Columns
+	meta_arr.append([0x0028,0x0100,'US','']) #Bits Allocated
+	meta_arr.append([0x0028,0x0101,'US','']) #Bits stored
+	meta_arr.append([0x0028,0x0102,'US','']) #High bit
+	meta_arr.append([0x0028,0x0103,'US','']) #Bit representation
 
 	#SC Image [C.8.6.2]
+	meta_arr.append([0x0008,0x0104,'LO','']) #Code Meaning
+
 
 	#SOP Common [C.12.1]
+	meta_arr.append([0x0008,0x0016,'UI','']) #SOP Class UID
+	meta_arr.append([0x0008,0x0018,'UI','']) #SOP Instance UID
+	meta_arr.append([0x0008,0x0070,'LO','']) #Manufacturer
+
+	'''
+	Old version of tags, kept just in case, if the set above is not enough
 
 	#Type 1 tags
-	meta_arr.append([0x0008,0x0016,'UI','']) #SOP Class UID
-	meta_arr.append([0x0008,0x1150,'UI','']) #Referenced SOP Class UID
-	meta_arr.append([0x0008,0x1155,'UI','']) #Referenced SOP Instance UID
-	meta_arr.append([0x0008,0x0104,'LO','']) #Code Meaning
-	meta_arr.append([0x0020,0x000D,'UI','']) #Study Instance UID
 	meta_arr.append([0x0010,0x0022,'CS','']) #Type of Patient ID
 	meta_arr.append([0x0010,0x0214,'LO','']) #Strain Stock Number
 	meta_arr.append([0x0010,0x0217,'LO','']) #Strain Source
 	meta_arr.append([0x0010,0x0222,'UC','']) #Genetic Modifications Description
 	meta_arr.append([0x0010,0x0217,'LO','']) #Genetic Modifications Nomenclature
-	meta_arr.append([0x0040,0xE020,'CS','']) #Type of Instances
 	meta_arr.append([0x0008,0x0054,'AE','']) #Retrieve AE Title
 	meta_arr.append([0x0088,0x0140,'UI','']) #Storage Media File-set UID
 	meta_arr.append([0x0008,0x0102,'SH','']) #Coding Scheme Designator
@@ -200,7 +214,7 @@ def writeMeta(args):
 
 	#Type 2 tags - can be empty if unkown
 	meta_arr.append([0x0020,0x0010,'SH','']) #Study ID
-	meta_arr.append([0x0020,0x0020,'CS','']) #Patient Orientation
+	meta_arr.append([0x0020,0x0020,'CS','']) #Patient Orientation'''
 
 	return meta_arr
 

@@ -7,9 +7,14 @@
 import sys
 import argparse
 import binary2DICOM as b2d
-from . import Interfile
+import json
 import datetime
 import time
+
+#this module somehow doesn't work
+#import interfile
+
+supported_versions = ["3.1"]
 
 """
 Reads Interfile header file.
@@ -44,15 +49,35 @@ def readHeader(filename):
 								meta_dict[line[0]] = line[1]
 
 
-				print("ERROR! COULDN'T FIND END OF INTERFILE HEADER KEY!")
+				print("ERROR! Couldn't find end of interfile header key!")
 				raise ValueError
 
 			else:
-				print("ERROR! COULDN'T FIND START OF INTERFILE HEADER KEY!")
+				print("ERROR! Couldn't find start of interfile header key!")
 				raise ValueError
 
 	except FileNotFoundError:
-		print("ERROR! INVALID FILENAME!")
+		print("ERROR! Invalid filename!")
+		raise ValueError
+
+"""
+Reads JSON file.
+
+:param filename: name of the JSON file
+:returns: dictionary containing header data or ValueError in case of incorrect argument
+
+"""
+def readJSON(filename):
+
+	json_args = []
+
+	with open(filename,"r") as f:
+		json_args = json.load(f)
+
+	try:
+		return readHeader(json_args["filename"])
+	except KeyError:
+		print("ERROR! Incorrect JSON file!")
 		raise ValueError
 
 """
@@ -67,13 +92,13 @@ def recognizeTypeInterfile(bytes_per_pix,type):
 	isFloat = lambda var_type: "float" in var_type
 
 	if type not in ["int","unsigned int", "float", "unsigned float"]:
-		print("ERROR! WRONG TYPE INPUT!")
+		print("ERROR! Wrong type input!")
 		raise ValueError
 
 	try:
 		bytes_per_pix = int(bytes_per_pix)
 	except ValueError:
-		print("ERROR! GOT INCORRECT BYTES PER PIX INPUT!")
+		print("ERROR! Got incorrect bytes per pixel input!")
 		raise ValueError
 
 	return b2d.recognize_type(bytes_per_pix,isSigned(type),isFloat(type))
@@ -113,11 +138,11 @@ def parseHead(head):
 						args[key_pair[0]] = head[key_pair[1]]
 
 				except KeyError as e:
-					print("ERROR! WRONG HEADER KEY: "+e.args[0])
+					print("ERROR! Wrong header key: "+e.args[0])
 					args[key_pair[0]] = ""
 
 				except ValueError:
-					print("ERROR! INCORRECT HEADER KEY (penultimate character is not a number): "+key_pair[1])
+					print("ERROR! Incorrect character key (penultimate character is not a number): "+key_pair[1])
 					args[key_pair[0]] = 0
 
 
@@ -126,15 +151,20 @@ def parseHead(head):
 			return args
 
 		else:
-			print("ERROR! NUMBER OF ARGS AND HEADER KEYS DOES NOT MATCH: "+ len(args_keys) +" "+ len(head_keys))
+			print("ERROR! Number of args and header keys does not match: "+ len(args_keys) +" "+ len(head_keys))
 			raise ValueError
 
 	else:
-		print("ERROR! DICTIONARY IS EMPTY!")
+		print("ERROR! Dictionary is empty!")
 		raise ValueError
 
 
-#TODO: do write meta file from interfile header
+"""
+Writes DICOM tags into the N x 4 array
+
+:param args: interfile header file dictionary
+:returns: N x 4 array with written DICOM tags
+"""
 def writeMeta(args):
 
 	meta_arr = []
@@ -219,9 +249,36 @@ def writeMeta(args):
 	return meta_arr
 
 def main():
-	dictionary = Interfile.load("recon_3_1_it3.hdr")
-	print("IT JUST WORKS")
-	#[TODO] management of any interfile file
+
+	#checking if the filename is in the arguments list
+	#[TODO] multiple DICOM converions
+	if len(sys.argv) != 2:
+		print("ERROR! Got {} arguments instead of 2!".format(len(sys.argv)))
+		raise ValueError
+
+	else:
+
+		dictionary = []
+
+		#checking if the file is a JSON or a Interfile header file
+		if (sys.argv[1][-4:] == ".hdr"):
+			dictionary = readHeader(sys.argv[1])
+		elif (sys.argv[1][-5:] == ".json"):
+			print("WARNING! This version of Interfile to DICOM does not use any other JSON values than 'filename' value!")
+			dictionary = readJSON(sys.argv[1])
+
+		#CASToR keys version check
+		if dictionary["CASToR version"] not in supported_versions:
+			#[TODO] LOAD KEY TEMPLATE FROM A FILE, DEPENDING ON THE CASToR VERSION
+			print("ERROR! Your CASToR version ({}) is not currently supported!".format(dictionary["CASToR version"]))
+		
+		#main conversion
+		else:
+			arguments = parseHead(dictionary)
+			array = b2d.read_binary(arguments)
+			tags = writeMeta(dictionary)
+			b2d.write_dicom(arguments,array,tags)
+			print("Conversion successful!")
 
 
 if __name__ == '__main__':

@@ -174,54 +174,55 @@ def writeMeta(args):
 	#now = str(time.time())
 
 	#Patient [C.7.1.1]
-	meta_arr.append([0x0010,0x0010,'PN',args['patient name']]) #Patient's name
-	meta_arr.append([0x0010,0x0020,'LO','']) #Patient's ID
-	meta_arr.append([0x0010,0x0022,'CS','']) #Type of Patient's ID
-	meta_arr.append([0x0010,0x0030,'DA','']) #Patient's Birth Date
-	meta_arr.append([0x0010,0x0040,'CS','']) #Patient's Sex
-	meta_arr.append([0x0040,0xE020,'CS','DICOM']) #Type of Instances
-	meta_arr.append([0x0008,0x1150,'UI','']) #Referenced SOP Class UID
-	meta_arr.append([0x0008,0x1155,'UI','']) #Referenced SOP Instance UID
+	meta_arr.append([0x0010,0x0010,'PN',args['patient name']]) #Patient's name [2]
+	meta_arr.append([0x0010,0x0020,'LO','']) #Patient's ID [2]
+	meta_arr.append([0x0010,0x0030,'DA','']) #Patient's Birth Date [2]
+	meta_arr.append([0x0010,0x0040,'CS','']) #Patient's Sex [2]
+	meta_arr.append([0x0040,0xE020,'CS','DICOM']) #Type of Instances [1]
+	meta_arr.append([0x0008,0x1150,'UI','Secondary Capture Image Storage']) #Referenced SOP Class UID [1]
+	meta_arr.append([0x0008,0x1155,'UI','1.3.6.1.4.1.9590.100.1.1.111165684411017669021768385720736873780']) #Referenced SOP Instance UID [1]
 
 
 	#Study [C.7.2.1]
-	meta_arr.append([0x0020,0x000D,'UI','']) #Study Instance UID
-	meta_arr.append([0x0008,0x0018,'UI','']) #SOP Instance UID
-	meta_arr.append([0x0008,0x0020,'DA','']) #Study date
-	meta_arr.append([0x0008,0x0030,'TM','']) #Study time
-	meta_arr.append([0x0008,0x0090,'PN','']) #Referring Physician's Name
+	meta_arr.append([0x0020,0x000D,'UI','1.3.6.1.4.1.9590.100.1.1.124313977412360175234271287472804872093']) #Study Instance UID [1]
+	meta_arr.append([0x0008,0x0020,'DA','']) #Study date [2]
+	meta_arr.append([0x0008,0x0030,'TM','']) #Study time [2]
+	meta_arr.append([0x0008,0x0090,'PN','']) #Referring Physician's Name [2]
 
 	#Series [C.7.3.1]
-	meta_arr.append([0x0020,0x000E,'UI','']) #Series Instance UID
-	meta_arr.append([0x0008,0x0060,'CS','']) #Modality
-	meta_arr.append([0x0020,0x0011,'IS','']) #Series Number
+	meta_arr.append([0x0020,0x000E,'UI','1.3.6.1.4.1.9590.100.1.1.369231118011061003403421859172643143649']) #Series Instance UID [1]
+	meta_arr.append([0x0008,0x0060,'CS','PT']) #Modality [1]
+	meta_arr.append([0x0020,0x0011,'IS','']) #Series Number [2]
 
 
 	#Equipement [C.8.6.1]
-	meta_arr.append([0x0008,0x0064,'CS','']) #Conversion type
+	meta_arr.append([0x0008,0x0064,'CS','WSD']) #Conversion type [1] ?
 
 	#General Image [C.7.6.1]
-	meta_arr.append([0x0020,0x0013,'IS','']) #Instance Number
+	meta_arr.append([0x0020,0x0013,'IS','']) #Instance Number [2]
 
 	#Image Pixel [C.7.6.3]
-	meta_arr.append([0x7FE0,0x0010,'OB','']) #Pixel Data
-	meta_arr.append([0x0028,0x0002,'US','']) #Samples per pixel
-	meta_arr.append([0x0028,0x0004,'CS','']) #Photometric interpolation
-	meta_arr.append([0x0028,0x0010,'US','']) #Rows
-	meta_arr.append([0x0028,0x0011,'US','']) #Columns
-	meta_arr.append([0x0028,0x0100,'US','']) #Bits Allocated
-	meta_arr.append([0x0028,0x0101,'US','']) #Bits stored
-	meta_arr.append([0x0028,0x0102,'US','']) #High bit
-	meta_arr.append([0x0028,0x0103,'US','']) #Bit representation
+	'''
+	for testing purposes, I'll leave it for binary2DICOM to fill out these
+
+	meta_arr.append([0x7FE0,0x0010,'OB','']) #Pixel Data [1]
+	meta_arr.append([0x0028,0x0002,'US',1]) #Samples per pixel [1]
+	meta_arr.append([0x0028,0x0004,'CS','MONOCHROME2']) #Photometric interpolation [1]
+	meta_arr.append([0x0028,0x0010,'US','']) #Rows [1]
+	meta_arr.append([0x0028,0x0011,'US','']) #Columns [1]
+	meta_arr.append([0x0028,0x0100,'US',8 * args['number of bytes per pixel']]) #Bits Allocated [1]
+	meta_arr.append([0x0028,0x0101,'US',8 * args['number of bytes per pixel']]) #Bits stored [1]
+	meta_arr.append([0x0028,0x0102,'US',15]) #High bit [1]
+	meta_arr.append([0x0028,0x0103,'US',1]) #Bit representation [1]'''
 
 	#SC Image [C.8.6.2]
-	meta_arr.append([0x0008,0x0104,'LO','']) #Code Meaning
+	meta_arr.append([0x0008,0x0104,'LO','test']) #Code Meaning [1]
 
 
 	#SOP Common [C.12.1]
-	meta_arr.append([0x0008,0x0016,'UI','']) #SOP Class UID
-	meta_arr.append([0x0008,0x0018,'UI','']) #SOP Instance UID
-	meta_arr.append([0x0008,0x0070,'LO','']) #Manufacturer
+	meta_arr.append([0x0008,0x0016,'UI','Secondary Capture Image Storage']) #SOP Class UID [1]
+	meta_arr.append([0x0008,0x0018,'UI','1.3.6.1.4.1.9590.100.1.1.111165684411017669021768385720736873780']) #SOP Instance UID [1]
+	meta_arr.append([0x0008,0x0070,'LO','NCBJ']) #Manufacturer
 
 	'''
 	Old version of tags, kept just in case, if the set above is not enough

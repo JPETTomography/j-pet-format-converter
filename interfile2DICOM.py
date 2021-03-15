@@ -69,6 +69,7 @@ Reads JSON file.
 """
 def readJSON(filename):
 
+	#[TODO] add more JSON arguments to be accepted
 	json_args = []
 
 	with open(filename,"r") as f:
@@ -249,6 +250,8 @@ def writeMeta(args):
 
 	return meta_arr
 
+#def convert(filename):
+
 def main():
 
 	#checking if the filename is in the arguments list
@@ -279,8 +282,8 @@ def main():
 			array = b2d.read_binary(arguments)
 			tags = writeMeta(dictionary)
 			b2d.write_dicom(arguments,array,tags)
-			print("Conversion successful!")
 
+		#[TODO] solve warnings in write DICOM
 
 if __name__ == '__main__':
 	main()

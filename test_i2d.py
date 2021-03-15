@@ -112,6 +112,10 @@ class HeaderTest(unittest.TestCase):
 		self.assertEqual(x["is_signed"], False)
 		self.assertEqual(x["byte_order"], "little")
 
+	def test_writeMeta(self):
+		#to be added when the function has been finalized 
+		print("PLACEHOLDER")
+
 	def test_i2d(self):
 		head_dict = i2d.readHeader('recon_3_1_it3.hdr')
 		args_dict = i2d.parseHead(head_dict)

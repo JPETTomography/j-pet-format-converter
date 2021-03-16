@@ -1,4 +1,5 @@
 __pycache__/
+.*/
 pretty2d.dcm
 pretty3d.dcm
 dicom.py

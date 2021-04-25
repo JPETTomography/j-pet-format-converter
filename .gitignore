@@ -1,0 +1,8 @@
+__pycache__/
+.*/
+.*
+*.dcm
+*.hdr
+*.img
+*.IMA
+dicom.py

@@ -1,0 +1,232 @@
+Dataset.file_meta -------------------------------
+(0002, 0000) File Meta Information Group Length  UL: 182
+(0002, 0001) File Meta Information Version       OB: b'\x00\x01'
+(0002, 0002) Media Storage SOP Class UID         UI: MR Image Storage
+(0002, 0003) Media Storage SOP Instance UID      UI: 1.3.12.2.1107.5.2.38.51066.30000020080302213867400000000
+(0002, 0010) Transfer Syntax UID                 UI: Explicit VR Little Endian
+(0002, 0012) Implementation Class UID            UI: 1.3.12.2.1107.5.2
+(0002, 0013) Implementation Version Name         SH: 'MR_VE11P'
+-------------------------------------------------
+(0008, 0005) Specific Character Set              CS: 'ISO_IR 100'
+(0008, 0008) Image Type                          CS: ['ORIGINAL', 'PRIMARY', 'M', 'ND', 'NORM']
+(0008, 0012) Instance Creation Date              DA: '20171005'
+(0008, 0013) Instance Creation Time              TM: '132621.616000'
+(0008, 0016) SOP Class UID                       UI: MR Image Storage
+(0008, 0018) SOP Instance UID                    UI: 1.3.12.2.1107.5.2.38.51066.30000020080302213867400000000
+(0008, 0020) Study Date                          DA: '20171005'
+(0008, 0021) Series Date                         DA: '20171005'
+(0008, 0022) Acquisition Date                    DA: '20171005'
+(0008, 0023) Content Date                        DA: '20171005'
+(0008, 0030) Study Time                          TM: '131931.024000'
+(0008, 0031) Series Time                         TM: '132621.610000'
+(0008, 0032) Acquisition Time                    TM: '132106.440000'
+(0008, 0033) Content Time                        TM: '132621.616000'
+(0008, 0050) Accession Number                    SH: ''
+(0008, 0060) Modality                            CS: 'MR'
+(0008, 0070) Manufacturer                        LO: 'SIEMENS'
+(0008, 0080) Institution Name                    LO: 'Monash Biomedical Imaging'
+(0008, 0081) Institution Address                 ST: 'Blackburn Road 770,Clayton,Victoria,AU,3800'
+(0008, 0090) Referring Physician's Name          PN: 'XNAT'
+(0008, 1010) Station Name                        SH: 'AWP45193'
+(0008, 1030) Study Description                   LO: 'ASPREE NEURO^Final'
+(0008, 103e) Series Description                  LO: 't1_mprage_sag_p2_iso_1_ADNI'
+(0008, 1040) Institutional Department Name       LO: 'Department'
+(0008, 1048) Physician(s) of Record              PN: 'MBI T and D Non HREC'
+(0008, 1090) Manufacturer's Model Name           LO: 'Skyra'
+(0008, 1140)  Referenced Image Sequence  3 item(s) ---- 
+(0010, 0010) Patient's Name                      PN: 'BARAN^Jakub'
+(0010, 0020) Patient ID                          LO: 'JB'
+(0010, 0021) Issuer of Patient ID                LO: '1'
+(0010, 0030) Patient's Birth Date                DA: '19920323'
+(0010, 0040) Patient's Sex                       CS: 'M'
+(0010, 1010) Patient's Age                       AS: '025Y'
+(0010, 1020) Patient's Size                      DS: "1.78"
+(0010, 1030) Patient's Weight                    DS: "77.0"
+(0010, 2000) Medical Alerts                      LO: 'None'
+(0010, 2110) Allergies                           LO: 'None'
+(0010, 21c0) Pregnancy Status                    US: 4
+(0010, 4000) Patient Comments                    LT: 'Project:MRH000 Subject:MRH000_353 Session:MRH000_353_MR01'
+(0018, 0015) Body Part Examined                  CS: 'BRAIN'
+(0018, 0020) Scanning Sequence                   CS: ['GR', 'IR']
+(0018, 0021) Sequence Variant                    CS: ['SK', 'SP', 'MP']
+(0018, 0022) Scan Options                        CS: 'IR'
+(0018, 0023) MR Acquisition Type                 CS: '3D'
+(0018, 0024) Sequence Name                       SH: '*tfl3d1_16ns'
+(0018, 0025) Angio Flag                          CS: 'N'
+(0018, 0050) Slice Thickness                     DS: "1.0"
+(0018, 0080) Repetition Time                     DS: "2300.0"
+(0018, 0081) Echo Time                           DS: "2.07"
+(0018, 0082) Inversion Time                      DS: "900.0"
+(0018, 0083) Number of Averages                  DS: "1.0"
+(0018, 0084) Imaging Frequency                   DS: "123.245603"
+(0018, 0085) Imaged Nucleus                      SH: '1H'
+(0018, 0086) Echo Number(s)                      IS: "1"
+(0018, 0087) Magnetic Field Strength             DS: "3.0"
+(0018, 0089) Number of Phase Encoding Steps      IS: "239"
+(0018, 0091) Echo Train Length                   IS: "1"
+(0018, 0093) Percent Sampling                    DS: "100.0"
+(0018, 0094) Percent Phase Field of View         DS: "93.75"
+(0018, 0095) Pixel Bandwidth                     DS: "230.0"
+(0018, 1000) Device Serial Number                LO: '45193'
+(0018, 1020) Software Versions                   LO: 'syngo MR D13C'
+(0018, 1030) Protocol Name                       LO: 't1_mprage_sag_p2_iso_1_ADNI'
+(0018, 1200) Date of Last Calibration            DA: ['20090304', '20090304']
+(0018, 1201) Time of Last Calibration            TM: ['123723.000000', '123723.000000']
+(0018, 1251) Transmit Coil Name                  SH: 'Body'
+(0018, 1310) Acquisition Matrix                  US: [0, 256, 240, 0]
+(0018, 1312) In-plane Phase Encoding Direction   CS: 'ROW'
+(0018, 1314) Flip Angle                          DS: "9.0"
+(0018, 1315) Variable Flip Angle Flag            CS: 'N'
+(0018, 1316) SAR                                 DS: "0.08466697326624"
+(0018, 1318) dB/dt                               DS: "0.0"
+(0018, 5100) Patient Position                    CS: 'HFS'
+(0019, 0010) Private Creator                     LO: 'SIEMENS MR HEADER'
+(0019, 1008) [CSA Image Header Type]             CS: 'IMAGE NUM 4'
+(0019, 1009) [CSA Image Header Version ??]       LO: '1.0'
+(0019, 100b) [SliceMeasurementDuration]          DS: "309605.0"
+(0019, 100f) [GradientMode]                      SH: 'Normal'
+(0019, 1011) [FlowCompensation]                  SH: 'No'
+(0019, 1012) [TablePositionOrigin]               SL: [0, 0, -1089]
+(0019, 1013) [ImaAbsTablePosition]               SL: [0, 0, -1089]
+(0019, 1014) [ImaRelTablePosition]               IS: [0, 0, 0]
+(0019, 1015) [SlicePosition_PCS]                 FD: [-105.29218881, -108.0643855, 117.3122244]
+(0019, 1017) [SliceResolution]                   DS: "1.0"
+(0019, 1018) [RealDwellTime]                     IS: "8500"
+(0020, 000d) Study Instance UID                  UI: 1.3.12.2.1107.5.2.38.51066.30000020080302213867400001038
+(0020, 000e) Series Instance UID                 UI: 1.3.12.2.1107.5.2.38.51066.30000020080302213867400000192
+(0020, 0010) Study ID                            SH: 'MRH000'
+(0020, 0011) Series Number                       IS: "2"
+(0020, 0012) Acquisition Number                  IS: "1"
+(0020, 0013) Instance Number                     IS: "1"
+(0020, 0032) Image Position (Patient)            DS: [-105.2921888071, -108.06438550241, 117.31222440385]
+(0020, 0037) Image Orientation (Patient)         DS: [-0.0122344423152, 0.99992515640984, 1.4560058e-008, 0.06103722714925, 0.00074682686275, -0.9981352108565]
+(0020, 0052) Frame of Reference UID              UI: 1.3.12.2.1107.5.2.19.45193.1.20171005131931289.0.0.0
+(0020, 1040) Position Reference Indicator        LO: ''
+(0020, 1041) Slice Location                      DS: "-99.246668410324"
+(0021, 0010) Private Creator                     LO: 'SIEMENS MR SDS 01'
+(0021, 0011) Private Creator                     LO: 'SIEMENS MR SDI 02'
+(0021, 1001) Private tag data                    IS: "77"
+(0021, 1004) Private tag data                    DS: "1.0"
+(0021, 1005) Private tag data                    IS: [0, 0, 0]
+(0021, 1006) Private tag data                    LO: 'void'
+(0021, 1007) Private tag data                    LO: 'NUMARIS/4'
+(0021, 1008) Private tag data                    SH: 'Normal'
+(0021, 1009) Private tag data                    LO: 'p2'
+(0021, 100a) Private tag data                    DS: "1.0"
+(0021, 100c) Private tag data                    SH: '+LPH'
+(0021, 100d) Private tag data                    US: 0
+(0021, 100f) Private tag data                    DS: [27.8939991, 23.26799965, 38.05500031]
+(0021, 1010) Private tag data                    IS: "41330004"
+(0021, 1011) Private tag data                    DS: "0.0"
+(0021, 1012) Private tag data                    FD: 2.0
+(0021, 1013) Private tag data                    DS: "0.0"
+(0021, 1014) Private tag data                    IS: "0"
+(0021, 1016) Private tag data                    DS: "0.0"
+(0021, 1017) Private tag data                    DS: "0.0"
+(0021, 1018) Private tag data                    SH: 'Head'
+(0021, 1019) Private tag data                    OB: Array of 83498 elements
+(0021, 101a) Private tag data                    LO: 'HEA;HEP'
+(0021, 101b) Private tag data                    DS: "1.0"
+(0021, 101c) Private tag data                    DS: [14.88145924, 12.92890358, 9.6884346]
+(0021, 101d) Private tag data                    IS: "2"
+(0021, 1022) Private tag data                    SH: 'SIEMENS'
+(0021, 1023) Private tag data                    IS: "0"
+(0021, 1025) Private tag data                    SL: [0, 0, -1089]
+(0021, 1026) Private tag data                    IS: Array of 38 elements
+(0021, 1027) Private tag data                    US: 0
+(0021, 102a) Private tag data                    IS: [255, 0, 0, 0, 0, 0, 0, 4865, 4866, 0, 0]
+(0021, 102b) Private tag data                    ST: '1;HFS;77.00;25.54;2;0;2;-1656101015'
+(0021, 102c) Private tag data                    DS: [1000000, 27.11722262, 27.11722177]
+(0021, 102d) Private tag data                    DS: [3.2, 0.36520889, 0]
+(0021, 102e) Private tag data                    IS: "2"
+(0021, 102f) Private tag data                    DS: [37, 37, 38]
+(0021, 1030) Private tag data                    DS: "0.0"
+(0021, 1031) Private tag data                    IS: "-1089"
+(0021, 1032) Private tag data                    SS: 0
+(0021, 1033) Private tag data                    SH: 'GC99'
+(0021, 1034) Private tag data                    DS: "1.0"
+(0021, 1035) Private tag data                    DS: "0.81427902"
+(0021, 1036) Private tag data                    DS: "0.0"
+(0021, 1038) Private tag data                    DS: "356.35185"
+(0021, 103b) Private tag data                    DS: "0.0"
+(0021, 103d) Private tag data                    CS: '3D'
+(0021, 1044) Private tag data                    DS: [7.07106781, 0.85179276]
+(0021, 1045) Private tag data                    CS: 'NO'
+(0021, 1046) Private tag data                    DS: "2124.844555"
+(0021, 1047) Private tag data                    CS: 'IEC'
+(0021, 1050) Private tag data                    US: 0
+(0021, 1051) Private tag data                    US: 1
+(0021, 1053) Private tag data                    CS: 'U'
+(0021, 1103) Private tag data                    DS: "309605.0"
+(0021, 1106) Private tag data                    LO: 'X_1_1_1_1_1_1_1_1_1_1_1_40'
+(0021, 111a) Private tag data                    SH: 'predicted'
+(0021, 111c) Private tag data                    IS: "1"
+(0021, 1124) Private tag data                    IS: "0"
+(0021, 1133) Private tag data                    IS: "128"
+(0021, 1135) Private tag data                    IS: "0"
+(0021, 1141) Private tag data                    SH: 'predicted'
+(0021, 1142) Private tag data                    IS: "8500"
+(0021, 1145) Private tag data                    SL: [0, 0, -1089]
+(0021, 1148) Private tag data                    IS: "96"
+(0021, 1149) Private tag data                    IS: "120"
+(0021, 114e) Private tag data                    IS: "0"
+(0021, 114f) Private tag data                    LO: 'HEA;HEP'
+(0021, 1151) Private tag data                    UL: 134217728
+(0021, 1154) Private tag data                    US: 0
+(0021, 1156) Private tag data                    LO: 'p2'
+(0021, 1158) Private tag data                    SH: '240*256'
+(0021, 1159) Private tag data                    IS: [0, 0, 0]
+(0021, 115b) Private tag data                    FD: [-105.29218881, -108.0643855, 117.3122244]
+(0021, 115e) Private tag data                    IS: "0"
+(0021, 1171) Private tag data                    UT: Array of 32 elements
+(0021, 1176) Private tag data                    LO: ['ChannelMixing:ND=true_CMM=1_CDM=1', 'ACC1', 'NormalizeAlgo:PreScan']
+(0025, 0010) Private Creator                     LO: 'SIEMENS MR EXTRACTED CSA HEADER'
+(0025, 1001)  Private tag data  2 item(s) ---- 
+(0028, 0002) Samples per Pixel                   US: 1
+(0028, 0004) Photometric Interpretation          CS: 'MONOCHROME2'
+(0028, 0010) Rows                                US: 256
+(0028, 0011) Columns                             US: 240
+(0028, 0030) Pixel Spacing                       DS: [1, 1]
+(0028, 0100) Bits Allocated                      US: 16
+(0028, 0101) Bits Stored                         US: 12
+(0028, 0102) High Bit                            US: 11
+(0028, 0103) Pixel Representation                US: 0
+(0028, 0106) Smallest Image Pixel Value          US: 0
+(0028, 0107) Largest Image Pixel Value           US: 34
+(0028, 1050) Window Center                       DS: "17.0"
+(0028, 1051) Window Width                        DS: "34.0"
+(0028, 1055) Window Center & Width Explanation   LO: 'Algo1'
+(0029, 0010) Private Creator                     LO: 'SIEMENS CSA HEADER'
+(0029, 0011) Private Creator                     LO: 'SIEMENS MEDCOM HEADER'
+(0029, 0012) Private Creator                     LO: 'SIEMENS MEDCOM HEADER2'
+(0029, 1008) [CSA Image Header Type]             CS: 'IMAGE NUM 4'
+(0029, 1009) [CSA Image Header Version]          LO: '20171005'
+(0029, 1010) [CSA Image Header Info]             OB: Array of 11072 elements
+(0029, 1018) [CSA Series Header Type]            CS: 'MR'
+(0029, 1019) [CSA Series Header Version]         LO: '20171005'
+(0029, 1020) [CSA Series Header Info]            OB: Array of 97220 elements
+(0029, 1120) [MedCom History Information]        OB: Array of 278 elements
+(0029, 1260) [Series Workflow Status]            LO: 'com'
+(0032, 1032) Requesting Physician                PN: 'MBI T and D Non HREC'
+(0032, 1060) Requested Procedure Description     LO: 'MR_EXAM'
+(0040, 0244) Performed Procedure Step Start Date DA: '20171005'
+(0040, 0245) Performed Procedure Step Start Time TM: '131931.212000'
+(0040, 0253) Performed Procedure Step ID         SH: '001'
+(0040, 0254) Performed Procedure Step Descriptio LO: 'MR Scan'
+(0040, 0275)  Request Attributes Sequence  1 item(s) ---- 
+(0051, 0010) Private Creator                     LO: 'SIEMENS MR HEADER'
+(0051, 1008) [CSA Image Header Type]             CS: 'IMAGE NUM 4'
+(0051, 1009) [CSA Image Header Version ??]       LO: '1.0'
+(0051, 100a) [Unknown]                           LO: 'TA 05:09'
+(0051, 100b) [AcquisitionMatrixText]             LO: '240*256'
+(0051, 100c) [Unknown]                           LO: 'FoV 240*256'
+(0051, 100d) [Unknown]                           SH: 'SP R99.2'
+(0051, 100e) [Unknown]                           LO: 'Sag>Tra(-3.5)>Cor(-0.7)'
+(0051, 100f) [CoilString]                        LO: 'HEA;HEP'
+(0051, 1011) [PATModeText]                       LO: 'p2'
+(0051, 1012) [Unknown]                           SH: 'TP 0'
+(0051, 1013) [PositivePCSDirections]             SH: '+LPH'
+(0051, 1016) [Unknown]                           LO: 'p2 M/ND/NORM'
+(0051, 1017) [Unknown]                           SH: 'SL 1.0'
+(0051, 1019) [Unknown]                           LO: 'A1/IR'
+(7fe0, 0010) Pixel Data                          OW: Array of 122880 elements

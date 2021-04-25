@@ -1,8 +1,8 @@
 __pycache__/
 .*/
-pretty2d.dcm
-pretty3d.dcm
+.*
+*.dcm
+*.hdr
+*.img
+*.IMA
 dicom.py
-dicom_example.IMA
-recon_3_1_it3.dcm
-recon_3_1_it3.img

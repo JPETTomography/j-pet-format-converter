@@ -4,6 +4,12 @@
 #
 #This script converts given file in interfile data format to DICOM
 
+import os
+import tempfile
+
+import pydicom
+from pydicom.dataset import Dataset, FileDataset
+
 import sys
 import argparse
 import binary2DICOM as b2d
@@ -203,18 +209,13 @@ def writeMeta(args):
 	meta_arr.append([0x0020,0x0013,'IS','']) #Instance Number [2]
 
 	#Image Pixel [C.7.6.3]
-	'''
-	for testing purposes, I'll leave it for binary2DICOM to fill out these
 
-	meta_arr.append([0x7FE0,0x0010,'OB','']) #Pixel Data [1]
 	meta_arr.append([0x0028,0x0002,'US',1]) #Samples per pixel [1]
 	meta_arr.append([0x0028,0x0004,'CS','MONOCHROME2']) #Photometric interpolation [1]
-	meta_arr.append([0x0028,0x0010,'US','']) #Rows [1]
-	meta_arr.append([0x0028,0x0011,'US','']) #Columns [1]
 	meta_arr.append([0x0028,0x0100,'US',8 * args['number of bytes per pixel']]) #Bits Allocated [1]
 	meta_arr.append([0x0028,0x0101,'US',8 * args['number of bytes per pixel']]) #Bits stored [1]
 	meta_arr.append([0x0028,0x0102,'US',15]) #High bit [1]
-	meta_arr.append([0x0028,0x0103,'US',1]) #Bit representation [1]'''
+	meta_arr.append([0x0028,0x0103,'US',1]) #Bit representation [1]
 
 	#SC Image [C.8.6.2]
 	meta_arr.append([0x0008,0x0104,'LO','test']) #Code Meaning [1]
@@ -224,6 +225,7 @@ def writeMeta(args):
 	meta_arr.append([0x0008,0x0016,'UI','Secondary Capture Image Storage']) #SOP Class UID [1]
 	meta_arr.append([0x0008,0x0018,'UI','1.3.6.1.4.1.9590.100.1.1.111165684411017669021768385720736873780']) #SOP Instance UID [1]
 	meta_arr.append([0x0008,0x0070,'LO','NCBJ']) #Manufacturer
+
 
 	'''
 	Old version of tags, kept just in case, if the set above is not enough
@@ -250,7 +252,81 @@ def writeMeta(args):
 
 	return meta_arr
 
-#def convert(filename):
+def convert(args,pixel_array,meta_arr = []):
+	# Create some temporary filenames
+	suffix = '.dcm'
+	filename_little_endian = tempfile.NamedTemporaryFile(suffix=suffix).name
+	filename_big_endian = tempfile.NamedTemporaryFile(suffix=suffix).name
+
+	print("Setting file meta information...")
+	# Populate required values for file meta information
+	file_meta = Dataset()
+	file_meta.MediaStorageSOPClassUID = '1.2.840.10008.5.1.4.1.1.2'
+	file_meta.MediaStorageSOPInstanceUID = "1.2.3"
+	file_meta.ImplementationClassUID = "1.2.3.4"
+
+	print("Setting dataset values...")
+	# Create the FileDataset instance (initially no data elements, but file_meta
+	# supplied)
+	ds = FileDataset(args['out_file'], {},
+                 file_meta=file_meta, preamble=b"\0" * 128)
+
+	# Add the data elements -- not trying to set all required here. Check DICOM
+	# standard
+	ds.PatientName = "Test^Firstname"
+	ds.PatientID = "123456"
+
+	# Set the transfer syntax
+	if args['byte_order'] == 'little':
+		ds.file_meta.TransferSyntaxUID = pydicom.uid.ExplicitVRLittleEndian
+		ds.is_little_endian = True
+		ds.is_implicit_VR = True
+	elif args['byte_order'] == 'big':
+		ds.file_meta.TransferSyntaxUID = pydicom.uid.ExplicitVRBigEndian
+		ds.is_little_endian = False
+		ds.is_implicit_VR = False
+
+	# Set creation date/time
+	dt = datetime.datetime.now()
+	ds.ContentDate = dt.strftime('%Y%m%d')
+	timeStr = dt.strftime('%H%M%S.%f')  # long format with micro seconds
+	ds.ContentTime = timeStr
+
+	if args['is_signed']:
+		ds.PixelRepresentation = 1
+	else:
+		ds.PixelRepresentation = 0
+
+	ds = b2d.write_meta(meta_arr,ds)
+
+	# Read from data the dimensions.
+	if len(pixel_array.shape) == 3:
+		ds.NumberOfFrames = pixel_array.shape[0]
+		ds.Columns = pixel_array.shape[1]
+		ds.Rows = pixel_array.shape[2]
+	else:
+		ds.Columns = pixel_array.shape[0]
+		ds.Rows = pixel_array.shape[1]
+
+	try:
+		err_str = '[ERROR] The file could not be created because of: '
+
+		data_type = b2d.recognize_type(args['bytes_per_pix'], args['is_signed'], args['is_float'])
+		if pixel_array.dtype != data_type:
+			pixel_array = pixel_array.astype(data_type)
+			ds.PixelData = pixel_array.tobytes()
+	except ValueError as ve:
+		print(err_str+'ValueError '+str(ve))
+		return -1
+	except FileExistsError as fe:
+		print(err_str+'FileExistsError '+str(fe))
+		return -1
+	except Exception as e:
+		print(err_str+str(e))
+		return -1
+
+	ds.save_as(args['out_file'].replace('.dcm', '') + '.dcm')
+
 
 def main():
 
@@ -258,7 +334,7 @@ def main():
 	#[TODO] multiple DICOM converions
 	if len(sys.argv) != 2:
 		print("ERROR! Got {} arguments instead of 2!".format(len(sys.argv)))
-		raise ValueError
+		sys.exit(1)
 
 	else:
 
@@ -278,10 +354,11 @@ def main():
 		
 		#main conversion
 		else:
+			#convert("test")
 			arguments = parseHead(dictionary)
 			array = b2d.read_binary(arguments)
 			tags = writeMeta(dictionary)
-			b2d.write_dicom(arguments,array,tags)
+			convert(arguments,array,tags)
 
 		#[TODO] solve warnings in write DICOM
 

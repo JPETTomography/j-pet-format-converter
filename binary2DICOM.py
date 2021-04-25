@@ -159,6 +159,11 @@ def write_dicom(arguments, pixel_array, meta_arr = []):
     file_meta.MediaStorageSOPClassUID = 'Secondary Capture Image Storage'
     file_meta.MediaStorageSOPInstanceUID = '1.3.6.1.4.1.9590.100.1.1.111165684411017669021768385720736873780'
     file_meta.ImplementationClassUID = '1.3.6.1.4.1.9590.100.1.0.100.4.0'
+
+    '''file_meta.MediaStorageSOPClassUID = '1.2.840.10008.5.1.4.1.1.2'
+    file_meta.MediaStorageSOPInstanceUID = "1.2.3"
+    file_meta.ImplementationClassUID = "1.2.3.4"'''
+
     # Since we don't want to store any additional info in the header, we set it to x00
     ds = FileDataset(arguments['out_file'], {}, file_meta=file_meta, preamble=b'0' * 128)
 
@@ -176,7 +181,7 @@ def write_dicom(arguments, pixel_array, meta_arr = []):
     ds.SeriesInstanceUID = '1.3.6.1.4.1.9590.100.1.1.369231118011061003403421859172643143649'
 
     # Manufacturer
-    ds.SecondaryCaptureDeviceManufctur = 'NCBJ'
+    #ds.SecondaryCaptureDeviceManufctur = 'NCBJ'
 
     # These are the necessary imaging components of the FileDataset object.
 

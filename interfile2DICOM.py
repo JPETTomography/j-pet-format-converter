@@ -17,6 +17,11 @@ import json
 import datetime
 import time
 
+# Dicom generator for testing purposes
+# [!]
+from dicomgenerator.exporter import export
+from dicomgenerator.factory import CTDatasetFactory
+
 #this module somehow doesn't work
 #import interfile
 
@@ -166,12 +171,8 @@ def parseHead(head):
 		raise ValueError
 
 
-"""
-Writes DICOM tags into the N x 4 array
+#write_meta pushed to bufor.py
 
-:param args: interfile header file dictionary
-:returns: N x 4 array with written DICOM tags
-"""
 def writeMeta(args):
 
 	meta_arr = []
@@ -253,79 +254,7 @@ def writeMeta(args):
 	return meta_arr
 
 def convert(args,pixel_array,meta_arr = []):
-	# Create some temporary filenames
-	suffix = '.dcm'
-	filename_little_endian = tempfile.NamedTemporaryFile(suffix=suffix).name
-	filename_big_endian = tempfile.NamedTemporaryFile(suffix=suffix).name
-
-	print("Setting file meta information...")
-	# Populate required values for file meta information
-	file_meta = Dataset()
-	file_meta.MediaStorageSOPClassUID = '1.2.840.10008.5.1.4.1.1.2'
-	file_meta.MediaStorageSOPInstanceUID = "1.2.3"
-	file_meta.ImplementationClassUID = "1.2.3.4"
-
-	print("Setting dataset values...")
-	# Create the FileDataset instance (initially no data elements, but file_meta
-	# supplied)
-	ds = FileDataset(args['out_file'], {},
-                 file_meta=file_meta, preamble=b"\0" * 128)
-
-	# Add the data elements -- not trying to set all required here. Check DICOM
-	# standard
-	ds.PatientName = "Test^Firstname"
-	ds.PatientID = "123456"
-
-	# Set the transfer syntax
-	if args['byte_order'] == 'little':
-		ds.file_meta.TransferSyntaxUID = pydicom.uid.ExplicitVRLittleEndian
-		ds.is_little_endian = True
-		ds.is_implicit_VR = True
-	elif args['byte_order'] == 'big':
-		ds.file_meta.TransferSyntaxUID = pydicom.uid.ExplicitVRBigEndian
-		ds.is_little_endian = False
-		ds.is_implicit_VR = False
-
-	# Set creation date/time
-	dt = datetime.datetime.now()
-	ds.ContentDate = dt.strftime('%Y%m%d')
-	timeStr = dt.strftime('%H%M%S.%f')  # long format with micro seconds
-	ds.ContentTime = timeStr
-
-	if args['is_signed']:
-		ds.PixelRepresentation = 1
-	else:
-		ds.PixelRepresentation = 0
-
-	ds = b2d.write_meta(meta_arr,ds)
-
-	# Read from data the dimensions.
-	if len(pixel_array.shape) == 3:
-		ds.NumberOfFrames = pixel_array.shape[0]
-		ds.Columns = pixel_array.shape[1]
-		ds.Rows = pixel_array.shape[2]
-	else:
-		ds.Columns = pixel_array.shape[0]
-		ds.Rows = pixel_array.shape[1]
-
-	try:
-		err_str = '[ERROR] The file could not be created because of: '
-
-		data_type = b2d.recognize_type(args['bytes_per_pix'], args['is_signed'], args['is_float'])
-		if pixel_array.dtype != data_type:
-			pixel_array = pixel_array.astype(data_type)
-			ds.PixelData = pixel_array.tobytes()
-	except ValueError as ve:
-		print(err_str+'ValueError '+str(ve))
-		return -1
-	except FileExistsError as fe:
-		print(err_str+'FileExistsError '+str(fe))
-		return -1
-	except Exception as e:
-		print(err_str+str(e))
-		return -1
-
-	ds.save_as(args['out_file'].replace('.dcm', '') + '.dcm')
+	export(dataset=CTDatasetFactory(), path="/tmp/dummy_dicom/dicom.dcm")
 
 
 def main():
@@ -357,8 +286,8 @@ def main():
 			#convert("test")
 			arguments = parseHead(dictionary)
 			array = b2d.read_binary(arguments)
-			tags = writeMeta(dictionary)
-			convert(arguments,array,tags)
+			meta_arr = writeMeta(dictionary)
+			convert(arguments,array,{})
 
 		#[TODO] solve warnings in write DICOM
 

@@ -9,13 +9,14 @@ import os
 import sys
 sys.path.insert(1,'..')
 
-import src.reader as rd
-from src.exceptions import InterfileInvalidHeaderException, InterfileInvalidValueException
+import converter.reader as rd
+from converter.exceptions import InterfileInvalidHeaderException, InterfileInvalidValueException
+from converter.settings import TEST_DIR
 
 class ReaderTest(unittest.TestCase):
 
     '''Test if header import (reader.py:13) works'''
-    def test_header_import(cls):
+    def test_header_import(self):
     
         #Header file content setup
 
@@ -46,11 +47,11 @@ process status :=
 
         #Header file path setup
 
-        p_cor = Path("/tmp/i2d_test/cor.hdr") #correct file
-        p_nofile = Path("/tmp/i2d_test/a") #no file
-        p_incor1 = Path("/tmp/i2d_test/incor1.hdr") #no starting tag
-        p_incor2 = Path("/tmp/i2d_test/incor2.hdr") #no ending tag
-        p_incor3 = Path("/tmp/i2d_test/incor3.hdr") #invalid formating
+        p_cor = Path(TEST_DIR+"/cor.hdr") #correct file
+        p_nofile = Path(TEST_DIR+"/a") #no file
+        p_incor1 = Path(TEST_DIR+"/incor1.hdr") #no starting tag
+        p_incor2 = Path(TEST_DIR+"/incor2.hdr") #no ending tag
+        p_incor3 = Path(TEST_DIR+"/incor3.hdr") #invalid formating
 
         #Header file creation
 
@@ -65,13 +66,13 @@ process status :=
 
         print("[TEST] CORRECT HEADER TEST")
         dict = rd.header_import(path= p_cor)
-        cls.assertEqual(dict["process status"],
+        self.assertEqual(dict["process status"],
                         "",
                         "ERROR! WRONG VALUE BINDED TO KEY IN header_import()")
-        cls.assertEqual(dict["matrix size [3]"],
+        self.assertEqual(dict["matrix size [3]"],
                         200,
                         "ERROR! WRONG VALUE BINDED TO KEY IN header_import()")
-        cls.assertEqual(dict["number format"],
+        self.assertEqual(dict["number format"],
                         "short float",
                         "ERROR! WRONG VALUE BINDED TO KEY IN header_import()")
 
@@ -81,21 +82,23 @@ process status :=
         inv_header = [p_nofile, p_incor1, p_incor2]
 
         for invalid in inv_header:
-            with cls.assertRaises(InterfileInvalidHeaderException):
+            with self.assertRaises(InterfileInvalidHeaderException):
                 dict = rd.header_import(path= invalid)
         
         #Test if method throws InterfileInvalidValueException
 
-        with cls.assertRaises(InterfileInvalidValueException):
+        with self.assertRaises(InterfileInvalidValueException):
                 dict = rd.header_import(path= p_incor3)
+
+
+    def test_read_image(self):
+        pass
 
 def run_tests():
 
     #make temporary directory for test files
-    try:
-        os.mkdir("/tmp/i2d_test")
-    except Exception:
-        pass
+    if not Path.exists(Path("/tmp/i2d_test")):
+        os.mkdir(TEST_DIR)
 
     #run tests
     unittest.main()

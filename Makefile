@@ -9,4 +9,5 @@ MOD2 := writer
 %.py: 
 	python3 $@
 
-tests: $(TEST_DIR)$(MOD1)_tests.py $(TEST_DIR)$(MOD2)_tests.py
+tests:
+	python3 tests/writer_tests.py

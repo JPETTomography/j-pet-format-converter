@@ -18,7 +18,7 @@ class WriterTests(unittest.TestCase):
 
     def test_write_dicom(self):
 
-        arg_dict = header_import(path= Path("../examples/recon_3_1_it3.hdr"))
+        arg_dict = header_import(path= Path("/home/kruk/Code/Python/j-pet-format-converter/examples/recon_3_1_it3.hdr"))
         write_dicom(arg_dict,{})
 
 def run_tests():

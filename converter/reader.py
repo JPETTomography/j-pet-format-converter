@@ -106,7 +106,7 @@ def read_binary(args: Dict):
     values = []
     total_pix = args['matrix size [1]']*args['matrix size [2]']*args['matrix size [3]']
     # Opening the file
-    with open(args['name of data file'], "rb") as f:
+    with open( args["header path"] + args['name of data file'], "rb") as f:
         byte_list = f.read()
     if total_pix != len(byte_list) // args['number of bytes per pixel']:
         raise IOError('[ERROR] The given image dimensions and encoding does not match given data!'\
@@ -118,7 +118,6 @@ def read_binary(args: Dict):
       values.append(int.from_bytes(byte_list[args['number of bytes per pixel'] * pix_no: (args['number of bytes per pixel'] * (pix_no + 1))], \
                                    byteorder=byte_order_local, signed="unsigned" not in args['number format']))
     resh_arr = np.asarray(values).reshape((args['matrix size [3]'], args['matrix size [2]'], args['matrix size [1]']))
-    print('[INFO] Reading image data is complete!')
     return resh_arr
 
 '''
@@ -136,7 +135,6 @@ dataset - the same dataset that came as an argument but with image data
 def read_image(args: Dict, dataset: Dataset):
 
   try:
-    args["name of data file"] = "../examples/" + args["name of data file"]
     pix_np = read_binary(args)
     dataset.PixelData = pix_np.astype(
         recognize_type(args['number of bytes per pixel'], True)

@@ -14,7 +14,6 @@ sys.path.insert(1, '..')
 from converter.exceptions import *
 from converter.settings import CASToR_VERSION
 from converter.binary2DICOM import recognize_type
-from converter.interfile2DICOM import parseHead
 '''
 Reads values from Interfile header file
 
@@ -118,6 +117,7 @@ def read_binary(args: Dict):
       values.append(int.from_bytes(byte_list[args['number of bytes per pixel'] * pix_no: (args['number of bytes per pixel'] * (pix_no + 1))], \
                                    byteorder=byte_order_local, signed="unsigned" not in args['number format']))
     resh_arr = np.asarray(values).reshape((args['matrix size [3]'], args['matrix size [2]'], args['matrix size [1]']))
+
     return resh_arr
 
 '''

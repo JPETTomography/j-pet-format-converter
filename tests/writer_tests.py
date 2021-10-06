@@ -9,6 +9,7 @@ import sys
 
 sys.path.insert(1,'..')
 
+#[NOTE] pylint throws an error here, but it works
 from converter.exceptions import *
 from converter.settings import TEST_DIR
 from converter.reader import header_import
@@ -16,9 +17,10 @@ from converter.writer import write_dicom
 
 class WriterTests(unittest.TestCase):
 
-    def test_write_dicom(self):
+    def test_write_dicom(self): #test emulates conversion process
 
         arg_dict = header_import(path= Path("/home/kruk/Code/Python/j-pet-format-converter/examples/recon_3_1_it3.hdr"))
+        #[TODO] separate adding meta data and image data to Dicom dataset from write_dicom
         write_dicom(arg_dict,{})
 
 def run_tests():

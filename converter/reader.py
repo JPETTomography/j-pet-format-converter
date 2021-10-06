@@ -6,6 +6,7 @@ import sys
 from typing import Dict
 from PIL import Image
 from pathlib import Path
+from numpy.core.records import array
 from pydicom.dataset import Dataset
 import numpy as np
 
@@ -14,83 +15,96 @@ sys.path.insert(1, '..')
 from converter.exceptions import *
 from converter.settings import CASToR_VERSION
 from converter.binary2DICOM import recognize_type
+
 '''
 Reads values from Interfile header file
 
-Arguemnts:
+Arguments:
 path - Path class containing path to the file 
-(absolute path recomended, but will implement conversion from relative path to absolute)
+(absolute path recommended, but will implement conversion from relative path to absolute)
 
 Returns:
-meta_dict - dictionary containg all header values
+meta_dict - dictionary containing all header values
 '''
 
 
-def header_import(path: Path):
+def header_import(path: Path) -> Dict:
 
   meta_dict = {}
 
   try:
-    with open(path, "r") as header:
+    with open(path, "r") as header: #opens header file
 
-      meta_dict["header path"] = str(path).strip(path.name)
+      meta_dict["header path"] = str(path).strip(path.name) #saves header path for later convenience
 
-      line = header.readline()
-      if line != "!INTERFILE := \n":
+      #validation of interfile header (no start flag) 
+      if header.readline() != "!INTERFILE := \n": 
         raise InterfileInvalidHeaderException('invalid start header format')
 
-      bufor = header.readlines()
+      header = header.readlines()
 
-      for line in bufor:
-        line = line.strip('!\n')
-        line = line.split(' :=')
-        if line[0] != '':
-          if 'end' in line[0].lower():
+      for line in header: #line e.g. "!KEY := value\n"
+
+        #stripping and splitting line from redundant symbols
+        key, value = line .strip('!\n') .split(' :=')
+
+        if key != '':
+
+          if 'end' in key.lower(): #check if importer encountered "!END OF INTERFILE :="
             return meta_dict
-          elif 'general' not in line[0].lower():
-            try:
-              meta_dict[line[0]] = int(line[1])
-            except ValueError:
-              if line[1][0] == '':
-                meta_dict[line[0]] = line[1]
+
+          elif 'general' not in key.lower(): #ignore all keys with general, usually with empty value
+            try: #attempt to cast value to int
+              meta_dict[key] = int(value) #[NOTE] could cause precision loss if the value was float
+
+            except ValueError: #it's not a number, then cast it as string
+
+              #[NOTE] from my observation sometimes value string has a space before the actual value
+              #       what can be annoying to deal with in the further steps
+              if value[0] == '':
+                meta_dict[key] = value
               else:
-                meta_dict[line[0]] = line[1][1:]
-            except Exception:
-              raise InterfileInvalidValueException('invalid header format')
+                meta_dict[key] = value[1:]
+
+            except Exception as e: #if something bad happens, throws an exception
+              raise InterfileInvalidValueException('invalid header format throws '+e.__class__.__name__)
 
     raise InterfileInvalidHeaderException('invalid end header format')
 
   except FileNotFoundError:
     print("[ERROR] file not found !")
-    raise InterfileInvalidHeaderException
+    raise InterfileInvalidHeaderException('header not found')
 
-  except Exception as e:
-    x = e.args
-    print("[ERROR]", x[0], "!")
-    raise e
 
 
 '''
 Read additional meta data from a JSON file
 
 Arguments:
-path - Path class containg path to a JSON file
+path - Path class containing path to a JSON file
 
 Returns:
-- dictionary conatining meta data
+- dictionary containing meta data
 '''
 
 
-def read_json_meta(path: Path):
+def read_json_meta(path: Path) -> Dict:
   pass
 
+'''
+Reads image data from a binary file.
 
-def read_binary(args: Dict):
-    """
-    Reads image data from a binary file.
-    :param arguments: Dictionary containing input parameters. 
-    :return: Numpy array containing pixel values. 
-    """
+[NOTE] THIS METHOD IS COPY-PASTED FROM BINARY2DICOM MODULE
+
+Arguments:
+args - Dictionary containing input parameters. 
+
+Returns:
+- Numpy array containing pixel values. 
+'''
+
+
+def read_binary(args: Dict) -> array:
 
     byte_order_local = ""
 
@@ -132,7 +146,7 @@ dataset - the same dataset that came as an argument but with image data
 '''
 
 
-def read_image(args: Dict, dataset: Dataset):
+def read_image(args: Dict, dataset: Dataset) -> Dataset:
 
   try:
     pix_np = read_binary(args)

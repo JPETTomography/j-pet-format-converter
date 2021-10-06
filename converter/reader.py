@@ -43,28 +43,32 @@ def header_import(path: Path) -> Dict:
 
       header = header.readlines()
 
-      for line in header: #line e.g. "!KEY := value\n"
+      for line in header: #line e.g. "!key := value\n"
 
-        #stripping and splitting line from redundant symbols
-        key, value = line .strip('!\n') .split(' :=')
+        if line != '':
 
-        if key != '':
-
-          if 'end' in key.lower(): #check if importer encountered "!END OF INTERFILE :="
+          if 'end' in line.lower(): #check if importer encountered "!END OF INTERFILE :="
             return meta_dict
 
-          elif 'general' not in key.lower(): #ignore all keys with general, usually with empty value
+          elif 'general' not in line.lower(): #ignore all line[0s with general, usually with empty value
+
+            #stripping and splitting line from redundant symbols
+            line = line.strip('!\n').split(' :=')
+
             try: #attempt to cast value to int
-              meta_dict[key] = int(value) #[NOTE] could cause precision loss if the value was float
+              meta_dict[line[0]] = int(line[1]) #? could cause precision loss if the value was float
+
+            except IndexError:
+              meta_dict[line[0]] = ''
 
             except ValueError: #it's not a number, then cast it as string
 
-              #[NOTE] from my observation sometimes value string has a space before the actual value
-              #       what can be annoying to deal with in the further steps
-              if value[0] == '':
-                meta_dict[key] = value
+              #? from my observation sometimes value string has a space before the actual value
+              #? what can be annoying to deal with in the further steps
+              if line[1][0] == '':
+                meta_dict[line[0]] = line[1]
               else:
-                meta_dict[key] = value[1:]
+                meta_dict[line[0]] = line[1][1:]
 
             except Exception as e: #if something bad happens, throws an exception
               raise InterfileInvalidValueException('invalid header format throws '+e.__class__.__name__)
@@ -166,5 +170,5 @@ def read_image(args: Dict, dataset: Dataset) -> Dataset:
 
   except KeyError as e:
     x = e.args
-    print("[ERROR] missing",x[0]," key from header!")
+    print("[ERROR] missing",x[0]," line[0 from header!")
     raise InterfileDataMissingException

@@ -6,15 +6,24 @@ import sys
 from pathlib import Path
 from typing import Dict
 from pydicom.dataset import Dataset
+from pydicom.uid import generate_uid
 
 sys.path.insert(1,'..')
 
 from converter.exceptions import *
-from converter.settings import TEST_DIR
+from converter.settings import *
 from converter.reader import read_image
 
 from dicomgenerator.exporter import export
 from dicomgenerator.factory import CTDatasetFactory
+
+import factory
+
+def write_uid() -> str:
+    return str(generate_uid(
+        prefix= UID,
+        entropy_srcs=[str(factory.random.randgen.getrandbits(100))] #? trochę nie wiem o co tutaj chodzi
+    ))
 
 '''
 Writes meta data from header dictionary to dicom dataset.
@@ -29,8 +38,13 @@ dataset - dicom dataset with header values
 
 def write_from_header(args: Dict, dataset: Dataset) -> Dataset: #TODO check value formatting
     
-    dataset.add_new((0x0010,0x0010),'PN',args["patient name"]) #! it breaks the dicom somehow
+    dataset.add_new((0x0010,0x0010),'PN',args["patient name"])
     dataset.add_new((0x008,0x0070),'LO',"NCBJ")
+
+    dataset.SOPInstanceUID = write_uid()
+    dataset.StudyInstanceUID = write_uid()
+    dataset.SeriesInstanceUID = write_uid()
+    dataset.FrameOfReferenceUID = write_uid()
 
     return dataset
 
@@ -56,7 +70,7 @@ nothing, because it creates a dicom file ([NOTE] can return bool value if needed
 
 def write_dicom(args: Dict, metadata: Dict) -> None:
     ds = CTDatasetFactory() #take working dataset from dicomgenerator
-    #ds = write_from_header(args= args, dataset= ds)
+    ds = write_from_header(args= args, dataset= ds)
     ds = read_image(args= args, dataset= ds) #add to the dataset an image
     name = "/" + args["patient name"] + ".dcm" 
     export(dataset= ds, path=Path(args["header path"]+name)) #save the file

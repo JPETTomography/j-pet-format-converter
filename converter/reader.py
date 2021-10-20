@@ -45,15 +45,17 @@ def header_import(path: Path) -> Dict:
 
       for line in header: #line e.g. "!key := value\n"
 
+        #stripping and splitting line from redundant symbols
+        line = line.strip('!\n').split(' :=')
+
         if line != '':
 
-          if 'end' in line.lower(): #check if importer encountered "!END OF INTERFILE :="
+          if 'end' in line[0].lower(): #check if importer encountered "!END OF INTERFILE :="
+            #print(meta_dict)
             return meta_dict
 
-          elif 'general' not in line.lower(): #ignore all line[0s with general, usually with empty value
+          elif 'general' not in line[0].lower(): #ignore all line[0s with general, usually with empty value
 
-            #stripping and splitting line from redundant symbols
-            line = line.strip('!\n').split(' :=')
 
             try: #attempt to cast value to int
               meta_dict[line[0]] = int(line[1]) #? could cause precision loss if the value was float

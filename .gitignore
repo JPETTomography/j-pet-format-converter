@@ -6,3 +6,4 @@ __pycache__/
 *.img
 *.IMA
 dicom.py
+venv/

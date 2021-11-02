@@ -89,8 +89,8 @@ process status :=
         #Test if method throws InterfileInvalidValueException
 
         #! commented out because i can't see why incorr3 has incorrect formatting
-        # with self.assertRaises(InterfileInvalidValueException):
-        #         dict = rd.header_import(path= p_incor3)
+        #with self.assertRaises(InterfileInvalidValueException):
+        #    dict = rd.header_import(path= p_incor3)
 
 
     def test_read_image(self):

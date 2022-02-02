@@ -10,9 +10,9 @@ from pydicom.uid import generate_uid
 
 sys.path.insert(1,'..')
 
-from converter.exceptions import *
-from converter.settings import *
-from converter.reader import read_image
+from exceptions import *
+from settings import *
+from reader import read_image
 
 from dicomgenerator.exporter import export
 from dicomgenerator.factory import CTDatasetFactory

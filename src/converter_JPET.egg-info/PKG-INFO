@@ -1,3 +1,20 @@
+Metadata-Version: 2.1
+Name: converter-JPET
+Version: 2.0.0
+Summary: This is a interfile to dicom converter created by Mateusz Kruk and Rafal Maselek.
+Home-page: https://github.com/JPETTomography/j-pet-format-converter
+Author: Mateusz Kruk, Rafał Masełek
+Author-email: krukm634@gmail.com
+License: UNKNOWN
+Project-URL: Bug Tracker, https://github.com/JPETTomography/j-pet-format-converter/issues
+Platform: UNKNOWN
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: Apache License
+Classifier: Operating System :: OS Independent
+Requires-Python: >=3.6
+Description-Content-Type: text/markdown
+License-File: LICENSE
+
 # j-pet-format-converter
 ## version 2.0
 ### Author: Rafał Masełek, Mateusz Kruk
@@ -111,3 +128,5 @@ In order to open DICOM file from Terminal, use command:
 >xmedcon -f name_of_file.dcm
 
 (X)MedCon has many other options and supported formats, see project's documentation for details.
+
+

@@ -2,9 +2,9 @@
 #Author: Mateusz Kruk
 #E-mail: mateusz64.kruk@student.uj.edu.pl
 
+from lib2to3.pgen2 import driver
 import sys
 from typing import Dict
-from PIL import Image
 from pathlib import Path
 from numpy.core.records import array
 from pydicom.dataset import Dataset
@@ -26,7 +26,6 @@ path - Path class containing path to the file
 Returns:
 meta_dict - dictionary containing all header values
 '''
-
 
 def header_import(path: Path) -> Dict:
 
@@ -174,3 +173,11 @@ def read_image(args: Dict, dataset: Dataset) -> Dataset:
     x = e.args
     print("[ERROR] missing",x[0]," line[0 from header!")
     raise InterfileDataMissingException
+
+def add_output_name(args: Dict, name: str) -> Dict:
+  args["patient name"] = name
+  return args
+
+def add_output_dir(args: Dict, directory: str) -> Dict:
+  args["header path"] = directory
+  return args

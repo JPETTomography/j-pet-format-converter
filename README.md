@@ -15,10 +15,14 @@ This script enables converting Interfile files to DICOM file format and importin
 + wheel (python library)
 
 If you use Debian/Ubuntu/Linux Mint you can install python3 using 'apt-get install' command:
-```bash sudo apt-get install python3 ```
+```bash
+sudo apt-get install python3 
+```
 
 If you use Mac OS X and have Homebrew installed, you can type:
-```bash sudo brew install python3 ```
+```bash
+sudo brew install python3
+```
 
 If you don't have Homebrew, then get it using the following command:
 

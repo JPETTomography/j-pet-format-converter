@@ -2,7 +2,6 @@
 #Author: Mateusz Kruk
 #E-mail: mateusz64.kruk@student.uj.edu.pl
 
-from lib2to3.pgen2 import driver
 import sys
 from typing import Dict
 from pathlib import Path
@@ -10,11 +9,11 @@ from numpy.core.records import array
 from pydicom.dataset import Dataset
 import numpy as np
 
-sys.path.insert(1, '..')
+#sys.path.insert(1, '..')
 
-from converter.exceptions import *
-from converter.settings import CASToR_VERSION
-from converter.binary2DICOM import recognize_type
+from exceptions import *
+from settings import CASToR_VERSION
+from binary2DICOM import recognize_type
 
 '''
 Reads values from Interfile header file
@@ -34,7 +33,7 @@ def header_import(path: Path) -> Dict:
   try:
     with open(path, "r") as header: #opens header file
 
-      meta_dict["header path"] = str(path).strip(path.name) #saves header path for later convenience
+      meta_dict["header path"] = str(path).replace(path.name,'') #saves header path for later convenience
 
       #validation of interfile header (no start flag) 
       if header.readline() != "!INTERFILE := \n": 
@@ -79,8 +78,6 @@ def header_import(path: Path) -> Dict:
   except FileNotFoundError:
     print("[ERROR] file not found !")
     raise InterfileInvalidHeaderException('header not found')
-
-
 
 '''
 Read additional meta data from a JSON file
@@ -174,10 +171,3 @@ def read_image(args: Dict, dataset: Dataset) -> Dataset:
     print("[ERROR] missing",x[0]," line[0 from header!")
     raise InterfileDataMissingException
 
-def add_output_name(args: Dict, name: str) -> Dict:
-  args["patient name"] = name
-  return args
-
-def add_output_dir(args: Dict, directory: str) -> Dict:
-  args["header path"] = directory
-  return args

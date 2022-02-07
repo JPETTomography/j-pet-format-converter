@@ -72,6 +72,5 @@ def write_dicom(args: Dict, metadata: Dict) -> None:
     ds = CTDatasetFactory() #take working dataset from dicomgenerator
     ds = write_from_header(args= args, dataset= ds)
     ds = read_image(args= args, dataset= ds) #add to the dataset an image
-    name = "/" + args["patient name"] + ".dcm" 
-    export(dataset= ds, path=Path(args["header path"]+name)) #save the file
+    export(dataset= ds, path=Path(args["output path"])) #save the file
     print('[INFO] Writing image is complete!')

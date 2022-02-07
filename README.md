@@ -1,4 +1,4 @@
-[![PyPI](https://img.shields.io/pypi/v/gatetools)](https://pypi.org/project/JPET-format-converter/)
+[![PyPI](https://img.shields.io/pypi/v/JPET-format-converter)](https://pypi.org/project/JPET-format-converter/)
 
 # j-pet-format-converter
 ## version 2.0.2

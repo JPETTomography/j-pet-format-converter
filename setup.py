@@ -19,7 +19,8 @@ setup(
                       "numpy",
                       "pyDicom",
                       "pylint",
-                      "python-coveralls"],
+                      "python-coveralls",
+                      'dicomgenerator'],
     keywords=['JPET','interfile','dicom','format','converter'],
     classifiers =[
     'Programming Language :: Python :: 3',

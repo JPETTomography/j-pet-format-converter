@@ -2,3 +2,6 @@ numpy
 pyDicom
 pylint
 python-coveralls
+dicomgenerator
+setuptools>=42
+wheel

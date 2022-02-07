@@ -1,9 +1,8 @@
 #Modules settings
 #Author: Mateusz Kruk
-#Version: 2.0
 #E-mail: mateusz64.kruk@student.uj.edu.pl
 
-VERSION = '2.0.1'
+VERSION = '2.0.2'
 
 CASToR_VERSION = '3.1'
 TEST_DIR = "/tmp/i2d_test"

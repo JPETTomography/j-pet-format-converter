@@ -1,6 +1,5 @@
 #Wrtier module
 #Author: Mateusz Kruk
-#Version: 2.0
 #E-mail: mateusz64.kruk@student.uj.edu.pl
 
 import sys
@@ -8,8 +7,6 @@ from pathlib import Path
 from typing import Dict
 from pydicom.dataset import Dataset
 from pydicom.uid import generate_uid
-
-sys.path.insert(1,'..')
 
 from exceptions import *
 from settings import *

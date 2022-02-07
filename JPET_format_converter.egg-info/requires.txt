@@ -1,3 +1,4 @@
+dicomgenerator
 numpy
 pyDicom
 pylint

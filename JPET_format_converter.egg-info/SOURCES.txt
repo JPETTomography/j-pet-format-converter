@@ -1,0 +1,8 @@
+LICENSE
+README.md
+setup.py
+JPET_format_converter.egg-info/PKG-INFO
+JPET_format_converter.egg-info/SOURCES.txt
+JPET_format_converter.egg-info/dependency_links.txt
+JPET_format_converter.egg-info/requires.txt
+JPET_format_converter.egg-info/top_level.txt

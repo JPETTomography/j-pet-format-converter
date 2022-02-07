@@ -1,0 +1,6 @@
+numpy
+pyDicom
+pylint
+python-coveralls
+setuptools>=42
+wheel

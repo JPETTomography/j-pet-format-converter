@@ -1,22 +1,24 @@
 # j-pet-format-converter
-## version 2.0
+## version 2.0.2
 ### Author: Rafał Masełek, Mateusz Kruk
-### Email: rafal.maselek@ncbj.gov.pl, krukm634@gmail.com
+### Email: rafal.maselek@ncbj.gov.pl, mateusz64.kruk@student.uj.edu.pl
 ### Modifications: Wojciech Krzemien 
 
-This script enables converting raw 3D binary images to DICOM file format and importing meta-data from external file.
+This script enables converting Interfile files to DICOM file format and importing meta-data from external file.
 
 ### Installation:
 **Prerequisites:**
 + Python (vers. 3.X.X recommended)
 + Numpy  (python library)
 + pyDicom (python library)
++ setuptools >= 42
++ wheel (python library)
 
 If you use Debian/Ubuntu/Linux Mint you can install python3 using 'apt-get install' command:
->sudo apt-get install python3
+```bash sudo apt-get install python3 ```
 
 If you use Mac OS X and have Homebrew installed, you can type:
->sudo brew install python3
+```bash sudo brew install python3 ```
 
 If you don't have Homebrew, then get it using the following command:
 
@@ -110,4 +112,5 @@ To install (X)MedCon on Debian/Ubuntu/Linux Mint from repositories:
 In order to open DICOM file from Terminal, use command:
 >xmedcon -f name_of_file.dcm
 
-(X)MedCon has many other options and supported formats, see project's documentation for details.
+(X)MedCon has many other options and supported formats, see project's documentation for 
+details.

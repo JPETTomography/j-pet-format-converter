@@ -1,5 +1,6 @@
 #Wrtier module
 #Author: Mateusz Kruk
+#Version: 2.0
 #E-mail: mateusz64.kruk@student.uj.edu.pl
 
 import sys

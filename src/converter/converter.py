@@ -1,8 +1,11 @@
+#Converter API
+#Author: Mateusz Kruk
+#Version: 2.0
+#E-mail: mateusz64.kruk@student.uj.edu.pl
+
 import argparse
 import sys
 from pathlib import Path
-
-#sys.path.insert(1, '..')
 
 import reader as rd
 import writer as wr

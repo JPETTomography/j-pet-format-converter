@@ -1,3 +1,5 @@
+[![PyPI](https://img.shields.io/pypi/v/gatetools)](https://pypi.org/project/JPET-format-converter/)
+
 # j-pet-format-converter
 ## version 2.0.2
 ### Author: Rafał Masełek, Mateusz Kruk

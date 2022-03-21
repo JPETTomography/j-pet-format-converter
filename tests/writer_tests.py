@@ -7,9 +7,10 @@ from pathlib import Path
 import os
 import sys
 
-sys.path.insert(1,'..')
+import JPET-format-converter
 
-#[NOTE] pylint throws an error here, but it works
+sys.path.insert(1,'../src/converter')
+
 from converter.exceptions import *
 from converter.settings import TEST_DIR
 from converter.reader import header_import

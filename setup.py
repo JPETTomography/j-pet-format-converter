@@ -6,7 +6,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
     long_description = fh.read()
 
 setup(
-    name='JPET-format-converter',
+    name='jpetconverter',
     version=VERSION,
     author='Mateusz Kruk, Rafał Masalek',
     description='This is a interfile to dicom converter created by Mateusz Kruk and Rafal Maselek.',

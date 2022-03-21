@@ -20,7 +20,7 @@ import factory
 def write_uid() -> str:
     return str(generate_uid(
         prefix= UID,
-        entropy_srcs=[str(factory.random.randgen.getrandbits(100))] #? trochę nie wiem o co tutaj chodzi
+        entropy_srcs=[str(factory.random.randgen.getrandbits(100))]
     ))
 
 '''

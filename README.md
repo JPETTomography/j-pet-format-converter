@@ -1,44 +1,78 @@
+[![PyPI](https://img.shields.io/pypi/v/JPET-format-converter)](https://pypi.org/project/JPET-format-converter/)
+
 # j-pet-format-converter
-## version 1.3
-### Author: Rafał Masełek
-### Email: rafal.maselek@ncbj.gov.pl
+## version 2.0.2
+### Author: Rafał Masełek, Mateusz Kruk
+### Email: rafal.maselek@ncbj.gov.pl, mateusz64.kruk@student.uj.edu.pl
 ### Modifications: Wojciech Krzemien 
 
-This script enables converting raw 3D binary images to DICOM file format and importing meta-data from external file.
+This script enables converting Interfile files to DICOM file format and importing meta-data from external file.
 
 ### Installation:
 **Prerequisites:**
 + Python (vers. 3.X.X recommended)
 + Numpy  (python library)
 + pyDicom (python library)
++ dicomgenerator
++ setuptools >= 42
++ wheel (python library)
 
 If you use Debian/Ubuntu/Linux Mint you can install python3 using 'apt-get install' command:
->sudo apt-get install python3
+```
+sudo apt-get install python3 
+```
 
-If you use Mac OS X and have Homebrew installed, you can type:
->sudo brew install python3
+To install a package, type following:
+```
+pip install JPET-format-converter
+```
 
-If you don't have Homebrew, then get it using the following command:
-
-sudo /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
-
-This will require providing root's (system administrator's) password. Python3 can be safely installed alongside python2, which is still (unfortunately) the default
-python distribution on many Linux systems.
-
-Additional python libraries can be installed using 'pip3' application, which should be installed with python3 from version 3.4.
-If you do not have it, you can install it by running:
->sudo apt-get install python3-pip 
-
-To get the necessary libraries, simply run the following commands in the terminal:
->sudo pip3 install numpy
-
->sudo pip3 install pydicom
-
-If you have any of the requirements already installed, you will receive a message informing you about it. You can then proceed to the next step.
+To download the required modules, please run:
+```
+pip install -r Requirements.txt
+```
+Where "Requirements.txt" is in the repository.
 
 ### Usage:
-To learn how to use script simply download the repository and run in terminal:
->python3 binary2DICOM.py --help
+Package provides an API for converting Interfile file into Dicom files. Interfile is specified by **two files**:
+
++ header file (.hdr), that has CASToRv3.1 keyset
++ image file (specified in the header)
+
+To convert a file/files using a command line, run the **converter.py** file, for example:
+```
+python3 converter.py header.hdr -o dicom.dcm
+```
+
+Using a ```--help``` flag will show all available commands.
+
+### Viewing the results:
+There are many applications to visualize images in DICOM files. Personally, I recommend using Amide:
+
+http://amide.sourceforge.net/
+
+To open a .dcm file use the FILE menu:\
+File > Import File(specify) > DICOM 3.0 via (X)MedCon.
+
+Amide uses a very useful tool called [(X)MedCon](http://xmedcon.sourceforge.net/),
+which can be downloaded from project's website or system's repositories, and it can be used alone to open DICOM files
+(but Amide provides better visualization).
+
+To install (X)MedCon on Debian/Ubuntu/Linux Mint from repositories:
+```
+sudo apt-get install xmedcon
+```
+
+In order to open DICOM file from Terminal, use command:
+```
+xmedcon -f name_of_file.dcm
+```
+
+(X)MedCon has many other options and supported formats, see project's documentation for 
+details.
+
+### binary2DICOM (deprecated)
+This section talks about previous binary2DICOM module, made by Rafał Masałek. In this version it's still partially used by the module, but it's deprecated and does not work correctly. It can still convert raw binary data into a dicom file, but it doesn't have mandatory tags.
 
 **Usage example:**
 This is an example command used to convert Gate output to DICOM format.
@@ -92,22 +126,4 @@ You code should look like this:
 ```convert({'meta': 'meta.txt', 'width': 256, 'is_signed': True, 'in_file': 'collimator_20', 'byte_order': 'little', 'height': 256, 'frames': 256, 'bytes_per_pix': 4, 'out_file': 'collimator_20-conv.dcm', 'is_float': False})```
 
 Of course you can store dictionary in a variable and pass this variable to the *convert()* function.
-### Viewing the results:
-There are many applications to visualize images in DICOM files. Personally, I recommend using Amide:
 
-http://amide.sourceforge.net/
-
-To open a .dcm file use the FILE menu:\
-File > Import File(specify) > DICOM 3.0 via (X)MedCon.
-
-Amide uses a very useful tool called [(X)MedCon](http://xmedcon.sourceforge.net/),
-which can be downloaded from project's website or system's repositories, and it can be used alone to open DICOM files
-(but Amide provides better visualization).
-
-To install (X)MedCon on Debian/Ubuntu/Linux Mint from repositories:
->sudo apt-get install xmedcon
-
-In order to open DICOM file from Terminal, use command:
->xmedcon -f name_of_file.dcm
-
-(X)MedCon has many other options and supported formats, see project's documentation for details.

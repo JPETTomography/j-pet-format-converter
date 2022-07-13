@@ -13,4 +13,3 @@ class InterfileInvalidValueException(I2DException):
 class InterfileDataMissingException(I2DException):
     '''Mandatory value missing from Interfile'''
     pass
-

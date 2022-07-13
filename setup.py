@@ -1,5 +1,5 @@
 from setuptools import setup, find_packages
-from src.converter.settings import VERSION
+from converter.settings import VERSION
 
 
 with open("README.md", "r", encoding="utf-8") as fh:

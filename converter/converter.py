@@ -6,16 +6,16 @@ import argparse
 import sys
 from pathlib import Path
 
-import reader as rd
-import writer as wr
-from exceptions import *
+import converter.reader as rd
+import converter.writer as wr
+from converter.exceptions import *
 
 version_str = "Version 2.0"
 
-def convert_intefile(input: str, output = None, directory = None, meta = ()) -> None:
+def convert_intefile_to_dicom(input: str, output=None, directory=None, meta=()) -> None:
     try:
         p = Path(input)
-        header_dict = rd.header_import(p)
+        header_dict = rd.interfile_header_import(p)
         if directory is not None:
             header_dict['output path'] = directory + '/'
         else:
@@ -43,9 +43,10 @@ def main():
     if len(args.in_file) == len(args.output_file):
         pair_arr = zip(args.in_file,args.output_file)
     else:
-        pair_arr = zip(args.in_file,[None for i in args.in_file])
+        pair_arr = zip(args.in_file, [None for i in args.in_file])
     for input, output in pair_arr:
-        convert_intefile(input,output,args.directory)
+        meta = {}
+        convert_intefile_to_dicom(input, output, args.directory, meta)
 
     print("Converted Complete")
     

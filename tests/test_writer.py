@@ -5,7 +5,7 @@ import logging
 from pathlib import Path
 import shutil
 
-from converter.reader import interfile_header_import
+from converter.reader import _read_interfile_header
 from converter.writer import write_dicom
 
 
@@ -26,6 +26,6 @@ class TestWriter:
         # Copy example interfile to temp test directory
         shutil.copy(source_path, test_path)
 
-        arg_dict = interfile_header_import(path=test_path)
+        arg_dict = _read_interfile_header(path=test_path)
 
         write_dicom(arg_dict, {})

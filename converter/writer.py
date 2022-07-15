@@ -6,11 +6,10 @@ from pathlib import Path
 from typing import Dict
 
 import factory
-import pydicom
 from pydicom.dataset import Dataset
 from pydicom.uid import generate_uid
 
-from converter.settings import *
+from converter.settings import UID
 from converter.reader import interfile_image_to_dicom_dataset
 from models.metadata import InterfileHeader, MetaFile
 
@@ -21,14 +20,14 @@ def init_dicom_dataset():
     ds = Dataset()
 
 
-def write_uid() -> str:
+def generate_uid() -> str:
     return str(generate_uid(
         prefix= UID,
         entropy_srcs=[str(factory.random.randgen.getrandbits(100))]
     ))
 
 
-def write_from_interfile_header(obj: InterfileHeader, dataset: Dataset) -> Dataset:
+def add_from_interfile_header(obj: InterfileHeader, dataset: Dataset) -> Dataset:
     """
         Writes interfile meta data from header dictionary to dicom dataset.
 
@@ -42,7 +41,7 @@ def write_from_interfile_header(obj: InterfileHeader, dataset: Dataset) -> Datas
 
     return dataset
 
-def write_from_json(obj: MetaFile, dataset: Dataset) -> Dataset:
+def add_from_json(obj: MetaFile, dataset: Dataset) -> Dataset:
     """
         Writes json meta data to dicom dataset.
 
@@ -60,10 +59,10 @@ def write_from_json(obj: MetaFile, dataset: Dataset) -> Dataset:
 
 def init_uuids(dataset: Dataset) -> Dataset:
     # Generate random UUIDs
-    dataset.SOPInstanceUID = write_uid()
-    dataset.StudyInstanceUID = write_uid()
-    dataset.SeriesInstanceUID = write_uid()
-    dataset.FrameOfReferenceUID = write_uid()
+    dataset.SOPInstanceUID = generate_uid()
+    dataset.StudyInstanceUID = generate_uid()
+    dataset.SeriesInstanceUID = generate_uid()
+    dataset.FrameOfReferenceUID = generate_uid()
 
     return dataset
 
@@ -76,7 +75,7 @@ def write_to_dataset(data: Dict, dataset: Dataset) -> None:
     else:
         raise ValueError
 
-def write_dicom(interfile_data: Dict, metadata: Dict) -> None:
+def write_dicom(interfile_data: InterfileHeader, metadata: MetaFile, output_path: Path) -> None:
     """
         Writing a dicom file
 
@@ -90,8 +89,8 @@ def write_dicom(interfile_data: Dict, metadata: Dict) -> None:
 
     ds = Dataset()
     ds = init_uuids(ds)
-    ds = write_from_interfile_header(obj=interfile_header, dataset=ds)
-    ds = write_from_json(obj=MetaFile(interfile_data), dataset=ds)
+    ds = add_from_interfile_header(obj=interfile_header, dataset=ds)
+    ds = add_from_json(obj=metadata, dataset=ds)
     ds = interfile_image_to_dicom_dataset(obj=interfile_header, dataset=ds) #add to the dataset an image
 
     # set most common options (most common encoding)
@@ -99,6 +98,6 @@ def write_dicom(interfile_data: Dict, metadata: Dict) -> None:
     ds.is_implicit_VR = False
 
     # Save file
-    ds.save_as(str(Path(args["outputPath"])))
+    ds.save_as(str(output_path))
 
     LOGGER.info('Writing image is complete!')

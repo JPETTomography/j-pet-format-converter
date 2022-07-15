@@ -76,8 +76,7 @@ class TestReader:
 
         #Test if methods outputs correct data from correct input
 
-        print("[TEST] CORRECT HEADER TEST")
-        dict = rd.interfile_header_import(path=p_cor)
+        dict = rd._read_interfile_header(path=p_cor)
         assert dict["process status"] == "", "ERROR! WRONG VALUE BINDED TO KEY"
 
         assert dict["matrix size [3]"] == 200, "ERROR! WRONG VALUE BINDED TO KEY"
@@ -86,18 +85,17 @@ class TestReader:
 
         #Test if method throws InterfileInvalidHeaderException
 
-        print("[TEST] INCORRECT HEADER TESTS")
         inv_header = [p_nofile, p_incor1, p_incor2]
 
         for invalid in inv_header:
             with pytest.raises(InterfileInvalidHeaderException):
-                dict = rd.interfile_header_import(path= invalid)
+                dict = rd._read_interfile_header(path= invalid)
 
         #Test if method throws InterfileInvalidValueException
 
         #! commented out because i can't see why incorr3 has incorrect formatting
         #with pytest.raises(InterfileInvalidValueException):
-        #    dict = rd.interfile_header_import(path= p_incor3)
+        #    dict = rd._read_interfile_header(path= p_incor3)
 
 
     def test_read_interfile_image(self, temp_directory):

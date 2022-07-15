@@ -3,6 +3,7 @@
 
 import logging
 import sys
+import json
 from typing import Dict
 from pathlib import Path
 from numpy.core.records import array
@@ -12,13 +13,13 @@ import numpy as np
 from converter.exceptions import InterfileDataMissingException, InterfileInvalidValueException
 from converter.exceptions import InterfileInvalidHeaderException
 from  converter.binary2DICOM import recognize_type
-from models.metadata import InterfileHeader
+from models.metadata import InterfileHeader, MetaFile
 
 
 LOGGER = logging.getLogger(__name__)
 
 
-def interfile_header_import(path: Path) -> Dict:
+def _read_interfile_header(path: Path) -> Dict:
     """
         Reads values from Interfile header file
 
@@ -61,7 +62,7 @@ def interfile_header_import(path: Path) -> Dict:
 
                         try:
                             # Attempt to cast value to int
-                            meta_dict[line[0]] = int(line[1])
+                            meta_dict[line[0].strip()] = int(line[1])
 
                         except IndexError:
                             meta_dict[line[0]] = ''
@@ -70,7 +71,7 @@ def interfile_header_import(path: Path) -> Dict:
                         # then leave it as string
                         except ValueError:
 
-                            meta_dict[line[0]] = line[1].strip()
+                            meta_dict[line[0].strip()] = line[1].strip()
 
                         except Exception as e: #if something bad happens, throws an exception
                             raise InterfileInvalidValueException(
@@ -84,7 +85,32 @@ def interfile_header_import(path: Path) -> Dict:
         raise InterfileInvalidHeaderException('header not found')
 
 
-def read_binary(args: Dict) -> array:
+def interfile_header_import(path: Path) -> InterfileHeader:
+    int_dict = _read_interfile_header(path)
+    return InterfileHeader(
+        modality=int_dict['imaging modality'],
+        keys_version=int_dict['version of keys'],
+        castor_version=int_dict['CASToR version'],
+        data_offset_in_bytes=int_dict['data offset in bytes'],
+        img_file_name=int_dict['name of data file'],
+        header_file_path=int_dict['header path'],
+        img_byte_order=int_dict['imagedata byte order'],
+        images_number=int_dict['total number of images'],
+        dimensions_number=int_dict['number of dimensions'],
+        matrix_size_1=int_dict['matrix size [1]'],
+        matrix_size_2=int_dict['matrix size [2]'],
+        matrix_size_3=int_dict['matrix size [3]'],
+        number_format=int_dict['number format'],
+        bytes_per_pixel=int_dict['number of bytes per pixel'],
+        scaling_factor_1=int_dict['scaling factor (mm/pixel) [1]'],
+        scaling_factor_2=int_dict['scaling factor (mm/pixel) [2]'],
+        scaling_factor_3=int_dict['scaling factor (mm/pixel) [3]'],
+        data_rescale_offset=int_dict['data rescale offset'],
+        data_rescale_slope=int_dict['data rescale slope'],
+        quantification_units=int_dict['quantification units'],
+    )
+
+def read_binary(obj: InterfileHeader) -> array:
     """
         Reads image data from a binary file.
 
@@ -97,39 +123,39 @@ def read_binary(args: Dict) -> array:
 
     byte_order_local = ""
 
-    if "little" in args['imagedata byte order'].lower():
+    if "little" in obj.img_byte_order.lower():
       byte_order_local = "little"
-    elif "big" in args['imagedata byte order'].lower():
+    elif "big" in obj.img_byte_order.lower():
       byte_order_local = "big"
-    elif "system" in args['imagedata byte order'].lower():
+    elif "system" in obj.img_byte_order.lower():
       byte_order_local = sys.byteorder
       LOGGER.warn('Byte order was not specified. I will use system\'s default: ' + sys.byteorder)
 
     values = []
-    total_pix = args['matrix size [1]']*args['matrix size [2]']*args['matrix size [3]']
+    total_pix = obj.matrix_size_1*obj.matrix_size_2*obj.matrix_size_3
     # Opening the file
-    with open(args["header path"] + args['name of data file'], "rb") as f:
+    with open(obj.header_file_path + obj.img_file_name, "rb") as f:
         byte_list = f.read()
-    if total_pix != len(byte_list) // args['number of bytes per pixel']:
+    if total_pix != len(byte_list) // obj.bytes_per_pixel:
         raise IOError(
             'Error: The given image dimensions and encoding does not match given data!'\
             + '\n\t>\tTotal number of pixels declared: '+str(total_pix)\
             + '\n\t>\tEstimation from file: '\
-            + str(len(byte_list) // args['number of bytes per pixel'])
+            + str(len(byte_list) // obj.bytes_per_pixel)
         )
 
     for pix_no in range(0, total_pix):
         values.append(
             int.from_bytes(
                 byte_list[
-                    args['number of bytes per pixel'] * pix_no : (args['number of bytes per pixel'] * (pix_no + 1))
+                    obj.bytes_per_pixel * pix_no : (obj.bytes_per_pixel * (pix_no + 1))
                 ], \
                 byteorder=byte_order_local,
-                signed="unsigned" not in args['number format']
+                signed="unsigned" not in obj.number_format
             )
     )
     resh_arr = np.asarray(values).reshape(
-        (args['matrix size [3]'], args['matrix size [2]'], args['matrix size [1]'])
+        (obj.matrix_size_3, obj.matrix_size_2, obj.matrix_size_1)
     )
 
     return resh_arr
@@ -140,7 +166,7 @@ def interfile_image_to_dicom_dataset(obj: InterfileHeader, dataset: Dataset) -> 
         Read image file from header data and put it into a Dicom Dataset
 
         Arguments:
-        args - dictionary containing header data
+        obj - object containing interfile header data
         dataset - Dicom Dataset to save the image data
 
         Returns:
@@ -148,9 +174,9 @@ def interfile_image_to_dicom_dataset(obj: InterfileHeader, dataset: Dataset) -> 
     """
 
     try:
-        pix_np = read_binary(args)
+        pix_np = read_binary(obj)
         dataset.PixelData = pix_np.astype(
-            recognize_type(args['number of bytes per pixel'], True)
+            recognize_type(obj.bytes_per_pixel, True)
         ).tobytes()
 
         if len(pix_np.shape) == 3:
@@ -169,7 +195,7 @@ def interfile_image_to_dicom_dataset(obj: InterfileHeader, dataset: Dataset) -> 
         raise InterfileDataMissingException
 
 
-def read_json_meta(path: Path) -> Dict:
+def read_json_meta(path: Path) -> MetaFile:
     """
         Read additional meta data from a JSON file
 
@@ -179,4 +205,6 @@ def read_json_meta(path: Path) -> Dict:
         Returns:
         - dictionary containing meta data
     """
-    pass
+    with open(path, 'r') as f:
+        data = json.load(f)
+        return MetaFile(data)

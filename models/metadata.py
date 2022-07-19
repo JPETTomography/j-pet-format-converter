@@ -15,7 +15,7 @@ class InterfileHeader(BaseModel):
     matrix_size_1: int
     matrix_size_2: int
     matrix_size_3: int
-    number_format: int
+    number_format: str
     bytes_per_pixel: int
     scaling_factor_1: str
     scaling_factor_2: str
@@ -25,12 +25,12 @@ class InterfileHeader(BaseModel):
     quantification_units: int
 
 class PatientData(BaseModel):
-    id: str
-    name: str=''
-    birth_date: str=''
-    sex: str=''
-    age: Optional[str]
-    weight: Optional[str]
+    PatientID: str
+    PatientName: str=''
+    PatientBirthDate: str=''
+    PatientSex: str=''
+    PatientAge: Optional[str]
+    PatientWeight: Optional[str]
 
 class MetaFile(BaseModel):
     patient: PatientData

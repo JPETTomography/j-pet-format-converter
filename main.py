@@ -35,11 +35,12 @@ def convert_intefile_to_dicom(input: str, output=None, directory=None, meta=None
             output_path += input.split('/')[-1].replace('.hdr','.dcm')
         wr.write_dicom(
             header_obj,
-            MetaFile(**metadata),
+            metadata,
             output_path=Path(input.split('/')[-1].replace('.hdr','.dcm'))
         )
     except:
-        LOGGER.error(sys.exc_info()[0])
+        raise
+        # LOGGER.error(sys.exc_info()[1])
 
 def main():
 
@@ -60,7 +61,7 @@ def main():
     parser.add_argument(
         '-m',
         '--meta',
-        help='path(s) to external meta data in JSON',
+        help='path to external meta data in JSON',
         type=str,
         nargs='?',
         default=None

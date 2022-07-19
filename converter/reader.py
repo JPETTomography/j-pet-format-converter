@@ -207,4 +207,4 @@ def read_json_meta(path: Path) -> MetaFile:
     """
     with open(path, 'r') as f:
         data = json.load(f)
-        return MetaFile(data)
+        return MetaFile(**data)

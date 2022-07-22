@@ -1,4 +1,4 @@
-#Reader module
+# Reader module
 #Author: Mateusz Kruk, Rafal Mozdzonek
 
 import logging
@@ -10,9 +10,8 @@ from numpy.core.records import array
 from pydicom.dataset import Dataset
 import numpy as np
 
-from converter.exceptions import InterfileDataMissingException, InterfileInvalidValueException
+from converter.exceptions import InterfileInvalidValueException
 from converter.exceptions import InterfileInvalidHeaderException
-from  converter.binary2DICOM import recognize_type
 from models.metadata import InterfileHeader, MetaFile
 
 
@@ -159,40 +158,6 @@ def read_binary(obj: InterfileHeader) -> array:
     )
 
     return resh_arr
-
-
-def interfile_image_to_dicom_dataset(obj: InterfileHeader, dataset: Dataset) -> Dataset:
-    """
-        Read image file from header data and put it into a Dicom Dataset
-
-        Arguments:
-        obj - object containing interfile header data
-        dataset - Dicom Dataset to save the image data
-
-        Returns:
-        dataset - the same dataset that came as an argument but with image data
-    """
-
-    try:
-        pix_np = read_binary(obj)
-        dataset.PixelData = pix_np.astype(
-            recognize_type(obj.bytes_per_pixel, True)
-        ).tobytes()
-
-        if len(pix_np.shape) == 3:
-            dataset.NumberOfFrames = pix_np.shape[0]
-            dataset.Columns = pix_np.shape[1]
-            dataset.Rows = pix_np.shape[2]
-        else:
-            dataset.Columns = pix_np.shape[0]
-            dataset.Rows = pix_np.shape[1]
-
-        return dataset
-
-    except KeyError as e:
-        x = e.args
-        LOGGER.error("Missing", x[0], " line from header!")
-        raise InterfileDataMissingException
 
 
 def read_json_meta(path: Path) -> MetaFile:

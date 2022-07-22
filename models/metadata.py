@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, validator
 from typing import Optional, List
 
 
@@ -24,6 +24,12 @@ class InterfileHeader(BaseModel):
     data_rescale_slope: int
     quantification_units: int
 
+    @validator('modality')
+    def modality_check(cls, v):
+        if v not in ['CT', 'PT']:
+            raise ValueError('Modality must contain CT or PT')
+        return v
+
 class PatientData(BaseModel):
     PatientID: str
     PatientName: str=''
@@ -34,8 +40,6 @@ class PatientData(BaseModel):
 
 class MetaFile(BaseModel):
     patient: PatientData
-
-    Modality: str='PT'
 
     ImageType: List[str]
 
@@ -51,8 +55,6 @@ class MetaFile(BaseModel):
 
     SamplesPerPixel: int
     PhotometricInterpretation: str
-    Rows: int
-    Columns: int
     PixelSpacing: List[float]
     BitsAllocated: int
     BitsStored: int
@@ -63,3 +65,7 @@ class MetaFile(BaseModel):
     RescaleIntercept: str
     RescaleSlope: str
     LossyImageCompression: str
+
+    @classmethod
+    def get_field_names(cls,alias=False):
+        return list(cls.schema(alias).get("properties").keys())

@@ -1,14 +1,13 @@
-#Converter API
+# Converter API
 #Author: Mateusz Kruk, Rafal Mozdzonek
 
+import sys
 import logging
 import argparse
-import sys
 from pathlib import Path
 
 import converter.reader as rd
 import converter.writer as wr
-from models.metadata import MetaFile
 
 
 LOGGER = logging.getLogger(__name__)
@@ -16,9 +15,15 @@ LOGGER = logging.getLogger(__name__)
 
 version_str = "Version 2.0"
 
-def convert_intefile_to_dicom(input: str, output=None, directory=None, meta=None) -> None:
+def convert_intefile_to_dicom(
+    input_path: str,
+    output=None,
+    directory=None,
+    meta=None,
+    extended_format=False
+) -> None:
     try:
-        p = Path(input)
+        p = Path(input_path)
         header_obj = rd.interfile_header_import(p)
         if meta:
             metadata = rd.read_json_meta(Path(meta))
@@ -32,15 +37,19 @@ def convert_intefile_to_dicom(input: str, output=None, directory=None, meta=None
         if output is not None:
             output_path += output
         else:
-            output_path += input.split('/')[-1].replace('.hdr','.dcm')
+            if not extended_format:
+                output_path += input_path.split('/')[-1].replace('.hdr','')
+            else:
+                output_path += input_path.split('/')[-1].replace('.hdr','.dcm')
+
         wr.write_dicom(
             header_obj,
             metadata,
-            output_path=Path(input.split('/')[-1].replace('.hdr','.dcm'))
+            output_path=Path(output_path),
+            extended_format=extended_format
         )
     except:
-        raise
-        # LOGGER.error(sys.exc_info()[1])
+        LOGGER.error(sys.exc_info()[1])
 
 def main():
 
@@ -67,8 +76,18 @@ def main():
         default=None
     )
 
+    parser.add_argument('--extended', action='store_true')
+    parser.add_argument('--no-extended', dest='extended', action='store_false')
+    parser.set_defaults(extended=False)
+
     args = parser.parse_args()
-    convert_intefile_to_dicom(args.input_file, args.output_file, args.directory, args.meta)
+    convert_intefile_to_dicom(
+        args.input_file,
+        args.output_file,
+        args.directory,
+        args.meta,
+        extended_format=args.extended
+    )
 
 
     LOGGER.info("Converted Complete")

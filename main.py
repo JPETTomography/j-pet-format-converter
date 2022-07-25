@@ -49,7 +49,8 @@ def convert_intefile_to_dicom(
             extended_format=extended_format
         )
     except:
-        LOGGER.error(sys.exc_info()[1])
+        raise
+        # LOGGER.error(sys.exc_info()[1])
 
 def main():
 

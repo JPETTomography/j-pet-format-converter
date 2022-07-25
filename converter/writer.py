@@ -57,19 +57,47 @@ def add_from_json(obj: MetaFile, dataset: Dataset) -> Dataset:
         Returns:
         dataset - dicom dataset with inserted values
     """
-    tags = MetaFile.get_field_names()
-    tags = filter(lambda k: k.isupper(), tags)
+    # tags = MetaFile.get_field_names()
+    # tags = filter(lambda k: k[0].isupper(), tags)
 
-    for tag in tags:
-        dataset[tag] = obj[tag]
+    # for tag in tags:
+        # dataset[tag] = obj[tag]
 
-    dataset.BitsAllocated = obj.BitsAllocated
+    # dataset.BitsAllocated = obj.BitsAllocated
 
     # patient_tags = MetaFile.patient.get_field_names()
-    # patient_tags = filter(lambda k: k.isupper(), patient_tags)
+    # patient_tags = filter(lambda k: k[0].isupper(), patient_tags)
 
     # for patient_tag in patient_tags:
     #     dataset[patient_tag] = obj[patient_tag]
+
+    dataset.ImageType = obj.ImageType
+
+    dataset.Manufacturer = obj.Manufacturer
+    dataset.StudyTime = obj.StudyTime
+
+    dataset.SeriesTime = obj.SeriesTime
+    dataset.AcquisitionTime = obj.AcquisitionTime
+
+    dataset.AccessionNumber = obj.AccessionNumber
+    dataset.SliceThickness = obj.SliceThickness
+
+    dataset.ImagePositionPatient = obj.ImagePositionPatient
+    dataset.ImageOrientationPatient = obj.ImageOrientationPatient
+
+    dataset.SamplesPerPixel = obj.SamplesPerPixel
+    dataset.PhotometricInterpretation = obj.PhotometricInterpretation
+
+    dataset.PixelSpacing = obj.PixelSpacing
+    dataset.BitsAllocated = obj.BitsAllocated
+    dataset.BitsStored = obj.BitsStored
+    dataset.HighBit = obj.HighBit
+    dataset.PixelRepresentation = obj.PixelRepresentation
+    dataset.WindowCenter = obj.WindowCenter
+    dataset.WindowWidth = obj.WindowWidth
+    dataset.RescaleIntercept = obj.RescaleIntercept
+    dataset.RescaleSlope = obj.RescaleSlope
+    dataset.LossyImageCompression = obj.LossyImageCompression
 
     dataset.PatientID = obj.patient.PatientID
     dataset.PatientName = obj.patient.PatientName

@@ -69,3 +69,6 @@ class MetaFile(BaseModel):
     @classmethod
     def get_field_names(cls,alias=False):
         return list(cls.schema(alias).get("properties").keys())
+
+    def __getitem__(self, item):
+        return getattr(self, item)

@@ -30,7 +30,15 @@ class InterfileHeader(BaseModel):
             raise ValueError('Modality must contain CT or PT')
         return v
 
-class PatientData(BaseModel):
+class BaseMetaData(BaseModel):
+    @classmethod
+    def get_field_names(cls,alias=False):
+        return list(cls.schema(alias).get("properties").keys())
+
+    def __getitem__(self, item):
+        return getattr(self, item)
+
+class PatientData(BaseMetaData):
     PatientID: str
     PatientName: str=''
     PatientBirthDate: str=''
@@ -38,7 +46,7 @@ class PatientData(BaseModel):
     PatientAge: Optional[str]
     PatientWeight: Optional[str]
 
-class MetaFile(BaseModel):
+class MetaFile(BaseMetaData):
     patient: PatientData
 
     ImageType: List[str]
@@ -65,10 +73,3 @@ class MetaFile(BaseModel):
     RescaleIntercept: str
     RescaleSlope: str
     LossyImageCompression: str
-
-    @classmethod
-    def get_field_names(cls,alias=False):
-        return list(cls.schema(alias).get("properties").keys())
-
-    def __getitem__(self, item):
-        return getattr(self, item)

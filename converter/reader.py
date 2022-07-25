@@ -7,7 +7,6 @@ import json
 from typing import Dict
 from pathlib import Path
 from numpy.core.records import array
-from pydicom.dataset import Dataset
 import numpy as np
 
 from converter.exceptions import InterfileInvalidValueException
@@ -16,6 +15,38 @@ from models.metadata import InterfileHeader, MetaFile
 
 
 LOGGER = logging.getLogger(__name__)
+
+
+def recognize_type(bytes_per_pix, is_signed, is_float=False):
+    """
+    A function to recognize type of the data.
+    :param bytes_per_pix: How many bytes are used to encode one pixel. 
+    :param is_signed: Are signed other unsigned integers used.
+    :param is_float: currently not used
+    :return: Numpy type
+    """
+    if is_signed:
+        if bytes_per_pix == 1:
+            return np.int8
+        elif bytes_per_pix == 2:
+            return np.int16
+        elif bytes_per_pix== 4:
+            return np.int32
+        elif bytes_per_pix == 8:
+            return np.int64
+        else:
+            raise ValueError('[ERROR] Invalid type declared!')
+    else:
+        if bytes_per_pix == 1:
+            return np.uint8
+        elif bytes_per_pix == 2:
+            return np.uint16
+        elif bytes_per_pix== 4:
+            return np.uint32
+        elif bytes_per_pix == 8:
+            return np.uint64
+        else:
+            raise ValueError('[ERROR] Invalid type declared!')
 
 
 def _read_interfile_header(path: Path) -> Dict:
@@ -72,7 +103,8 @@ def _read_interfile_header(path: Path) -> Dict:
 
                             meta_dict[line[0].strip()] = line[1].strip()
 
-                        except Exception as e: #if something bad happens, throws an exception
+                        # if something bad happens, throws an exception
+                        except Exception as e:
                             raise InterfileInvalidValueException(
                                 'invalid header format throws '+ e.__class__.__name__
                             )

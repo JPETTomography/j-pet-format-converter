@@ -5,7 +5,7 @@ import logging
 from pathlib import Path
 import shutil
 
-from converter.reader import _read_interfile_header
+from converter.reader import interfile_header_import, read_json_meta
 from converter.writer import write_dicom
 
 
@@ -17,15 +17,20 @@ logging.basicConfig(
 
 class TestWriter:
 
-    def test_write_dicom(self, temp_directory): #test emulates conversion process
+    def test_write_dicom_standard_ok(self, temp_directory): #test emulates conversion process
 
         file_name = "example_1.hdr"
-        source_path = Path(f"examples/{file_name}")
+        metafile_name = "metadata.json"
+        source_path = Path(f"examples/")
+        metafile_path = Path(f"examples/{metafile_name}")
         test_path = Path(temp_directory / file_name)
+        output_path = Path(temp_directory / file_name.replace('.hdr',''))
 
         # Copy example interfile to temp test directory
-        shutil.copy(source_path, test_path)
+        shutil.copytree(source_path, temp_directory, dirs_exist_ok=True)
 
-        arg_dict = _read_interfile_header(path=test_path)
+        interfile_header = interfile_header_import(path=test_path)
 
-        write_dicom(arg_dict, {})
+        metadata = read_json_meta(metafile_path)
+
+        write_dicom(interfile_header, metadata, output_path, extended_format=False)

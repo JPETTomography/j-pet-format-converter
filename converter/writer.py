@@ -138,6 +138,14 @@ def create_slice_dataset(
 
     return ds
 
+def correct_slice_position(dataset: Dataset, i: int):
+    slice_thickness = float(dataset.SliceThickness)
+    dataset.SliceLocation = dataset.ImagePositionPatient[2] - i*slice_thickness
+    dataset.ImagePositionPatient[2] -= i*slice_thickness
+    dataset.InstanceNumber = str(i+1)
+
+    return dataset
+
 def write_dicom(
     interfile_data: InterfileHeader,
     metadata: MetaFile,
@@ -172,6 +180,8 @@ def write_dicom(
                 metadata=metadata,
                 extended_format=extended_format
             )
+
+            ds = correct_slice_position(ds, i)
 
             # Set most common options (most common encoding)
             ds.is_little_endian = True

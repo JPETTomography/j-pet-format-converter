@@ -56,7 +56,7 @@ class MetaFile(BaseMetaData):
     SeriesTime: str=''
     AcquisitionTime: str=''
     AccessionNumber: str=''
-    SliceThickness: str=''
+    SliceThickness: str
 
     ImagePositionPatient: List[float]
     ImageOrientationPatient: List[int]

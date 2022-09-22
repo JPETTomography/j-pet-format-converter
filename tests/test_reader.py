@@ -98,4 +98,5 @@ class TestReader:
                 rd._read_interfile_header(path= invalid)
 
     def test_read_interfile_image(self, temp_directory):
-        pass
+        'TODO: Handle tests for image conversion: requires the generation of artificial images'
+        'Will be handled in the next step'

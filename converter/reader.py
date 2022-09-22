@@ -19,11 +19,15 @@ LOGGER = logging.getLogger(__name__)
 
 def recognize_type(bytes_per_pix, is_signed, is_float=False):
     """
-    A function to recognize type of the data.
-    :param bytes_per_pix: How many bytes are used to encode one pixel. 
-    :param is_signed: Are signed other unsigned integers used.
-    :param is_float: currently not used
-    :return: Numpy type
+        A function to recognize type of the data.
+
+        Arguments:
+        bytes_per_pix - How many bytes are used to encode one pixel. 
+        is_signed - Are signed other unsigned integers used.
+        is_float - currently not used
+
+        Returns:
+        - Numpy type
     """
     if is_signed:
         if bytes_per_pix == 1:
@@ -73,35 +77,35 @@ def _read_interfile_header(path: Path) -> Dict:
             if header.readline() != "!INTERFILE := \n":
                 raise InterfileInvalidHeaderException('invalid start header format')
 
-            # Get reast of the file
+            # Get rest of the file
             header = header.readlines()
 
             for line in header: #line e.g. "!key := value\n"
 
                 # Stripping and splitting line from redundant symbols
-                line = line.strip('!\n').split(':=')
+                key, value = line.strip('!\n').split(':=')
 
-                if line != '':
+                if key != '':
 
                      # Check if importer encountered "!END OF INTERFILE :="
-                    if 'end' in line[0].lower():
+                    if 'end' in key.lower():
                         return meta_dict
 
                     # Ignore all lines with `general` keyword, usually with empty value
-                    elif 'general' not in line[0].lower():
+                    elif 'general' not in key.lower():
 
                         try:
                             # Attempt to cast value to int
-                            meta_dict[line[0].strip()] = int(line[1])
+                            meta_dict[key.strip()] = int(value)
 
                         except IndexError:
-                            meta_dict[line[0]] = ''
+                            meta_dict[key.strip()] = ''
 
                         # if it's not a number or it's string repesentation of float
                         # then leave it as string
                         except ValueError:
 
-                            meta_dict[line[0].strip()] = line[1].strip()
+                            meta_dict[key.strip()] = value.strip()
 
                         # if something bad happens, throws an exception
                         except Exception as e:

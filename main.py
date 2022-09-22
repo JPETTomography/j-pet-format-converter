@@ -22,35 +22,30 @@ def convert_intefile_to_dicom(
     meta=None,
     extended_format=False
 ) -> None:
-    try:
-        p = Path(input_path)
-        header_obj = rd.interfile_header_import(p)
-        if meta:
-            metadata = rd.read_json_meta(Path(meta))
-        else:
-            metadata = None
+    p = Path(input_path)
+    header_obj = rd.interfile_header_import(p)
+    if meta:
+        metadata = rd.read_json_meta(Path(meta))
+    else:
+        metadata = None
 
-        if directory is not None:
-            output_path = directory + '/'
-        else:
-            output_path = './'
-        if output is not None:
-            output_path += output
-        else:
-            if not extended_format:
-                output_path += input_path.split('/')[-1].replace('.hdr','')
-            else:
-                output_path += input_path.split('/')[-1].replace('.hdr','.dcm')
-
-        wr.write_dicom(
-            header_obj,
-            metadata,
-            output_path=Path(output_path),
-            extended_format=extended_format
+    if directory is not None:
+        output_path = directory + '/'
+    else:
+        output_path = './'
+    if output is not None:
+        output_path += output
+    else:
+        output_path += input_path.split('/')[-1].replace(
+            '.hdr', '.dcm' if extended_format else ''
         )
-    except:
-        raise
-        # LOGGER.error(sys.exc_info()[1])
+
+    wr.write_dicom(
+        header_obj,
+        metadata,
+        output_path=Path(output_path),
+        extended_format=extended_format
+    )
 
 def main():
 

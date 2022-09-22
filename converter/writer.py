@@ -160,8 +160,6 @@ def write_dicom(
         metadata - additional meta data to add
         output_path - path to save output
         extended_format - should we use extended format (for 3D data)
-
-        creates a dicom file
     """
     binary_img = read_binary(interfile_data)
 

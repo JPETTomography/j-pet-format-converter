@@ -1,9 +1,10 @@
-from pydantic import BaseModel, validator
-from typing import Optional, List
+from typing import List, Tuple, Optional, Union, Literal
+
+from pydantic import BaseModel
 
 
 class InterfileHeader(BaseModel):
-    modality: str
+    modality: Literal['CT', 'PT']
     keys_version: str
     castor_version: str
     data_offset_in_bytes: int
@@ -24,16 +25,11 @@ class InterfileHeader(BaseModel):
     data_rescale_slope: int
     quantification_units: int
 
-    @validator('modality')
-    def modality_check(cls, v):
-        if v not in ['CT', 'PT']:
-            raise ValueError('Modality must contain CT or PT')
-        return v
-
 class BaseMetaData(BaseModel):
     @classmethod
     def get_field_names(cls,alias=False):
-        return list(cls.schema(alias).get("properties").keys())
+        props = cls.schema(alias).get("properties")
+        return list(props.keys()) if props else []
 
     def __getitem__(self, item):
         return getattr(self, item)
@@ -45,31 +41,99 @@ class PatientData(BaseMetaData):
     PatientSex: str=''
     PatientAge: Optional[str]
     PatientWeight: Optional[str]
+    PatientPosition: str
 
-class MetaFile(BaseMetaData):
+class CTMetaFile(BaseMetaData):
     patient: PatientData
+    patientCenter: Tuple[int, int, int]
 
-    ImageType: List[str]
+    ImageOrientationPatient: Tuple[float, float, float, float, float, float]
+
+    ImageType: Tuple[Literal['ORIGINAL', 'DERIVED'], Literal['PRIMARY', 'SECONDARY']]
 
     Manufacturer: str=''
-    StudyTime: str=''
-    SeriesTime: str=''
-    AcquisitionTime: str=''
-    AccessionNumber: str=''
-    SliceThickness: str
+    StudyTime: Optional[str]
+    SeriesTime: Optional[str]
+    AcquisitionTime: Optional[str]
+    AccessionNumber: Optional[str]
 
-    ImagePositionPatient: List[float]
-    ImageOrientationPatient: List[int]
+    PhotometricInterpretation: Literal["MONOCHROME1", "MONOCHROME2"]
+    WindowCenter: Union[List[int], str]
+    WindowWidth: Union[List[int], str]
+    LossyImageCompression: Optional[str]
 
-    SamplesPerPixel: int
-    PhotometricInterpretation: str
-    PixelSpacing: List[float]
-    BitsAllocated: int
-    BitsStored: int
-    HighBit: int
-    PixelRepresentation: int
-    WindowCenter: List[int]
-    WindowWidth: List[int]
-    RescaleIntercept: str
-    RescaleSlope: str
-    LossyImageCompression: str
+class PetSeries(BaseMetaData):
+    SeriesDescription: Optional[str]
+    SeriesDate: str
+    SeriesTime: str
+    CollimatorType: Literal['NONE', 'RING']
+    CorrectedImage: List[Literal['DECY', 'ATTN', 'SCAT', 'DTIM', 'MOTN', 'PMOT', 'CLN', 'RAN', 'RADL', 'DCAL', 'NORM', 'BEDR']]
+    SeriesType: Tuple[Literal['STATIC', 'DYNAMIC', 'GATED', 'WHOLE BODY'], Literal['IMAGE', 'REPROJECTION']]
+    Units: Literal['CNTS', 'NONE', 'CM2', 'CM2ML', 'PCNT', 'CPS', 'BQML', 'MGMINML', 'UMOLMINML', 'MLMING', 'MLG', '1CM', 'UMOLML', 'PROPCNTS', 'PROPCPS', 'MLMINML', 'MLML', 'GML', 'STDDEV']
+    CountsSource: Literal['EMISSION', 'TRANSMISSION']
+    DecayCorrection: Literal['NONE', 'START', 'ADMIN']
+
+class RadionuclideCode(BaseMetaData):
+    CodeValue: str
+    CodingSchemeDesignator: str
+    CodeMeaning: str
+    MappingResource: str
+    ContextGroupVersion: str
+
+class RadionuclideInformation(BaseMetaData):
+    RadionuclideCodeSequence: List[RadionuclideCode]
+
+class PETIsotope(BaseMetaData):
+    RadiopharmaceuticalInformationSequence: List[RadionuclideInformation]
+
+class PatientOrientationModifierCode(BaseMetaData):
+    CodeValue: str
+    CodingSchemeDesignator: str
+    CodeMeaning: str
+    MappingResource: str
+    ContextGroupVersion: str
+
+class PatientOrientationCode(BaseMetaData):
+    CodeValue: str
+    CodingSchemeDesignator: str
+    CodeMeaning: str
+    MappingResource: str
+    ContextGroupVersion: str
+    PatientOrientationModifierCodeSequence: List[Optional[PatientOrientationModifierCode]]
+
+class PatientGantryRelationshipCode(BaseMetaData):
+    CodeValue: str
+    CodingSchemeDesignator: str
+    CodeMeaning: str
+    MappingResource: str
+    ContextGroupVersion: str
+
+class PatientOrientation(BaseMetaData):
+    PatientOrientationCodeSequence: List[Optional[PatientOrientationCode]]
+    PatientGantryRelationshipCodeSequence: List[Optional[PatientGantryRelationshipCode]]
+
+class PETMetaFile(BaseMetaData):
+    patient: PatientData
+    petSeries: PetSeries
+    petIsotope: PETIsotope
+    petPatientOrientation: PatientOrientation
+    patientCenter: Tuple[int, int, int]
+
+    ImageOrientationPatient: Tuple[float, float, float, float, float, float]
+
+    ImageType: Tuple[Literal['ORIGINAL', 'DERIVED'], Literal['PRIMARY', 'SECONDARY']]
+    FrameReferenceTime: str
+    DecayFactor: str
+
+    Manufacturer: str=''
+    StudyTime: Optional[str]
+    SeriesTime: Optional[str]
+    AcquisitionTime: Optional[str]
+    AccessionNumber: Optional[str]
+
+    PhotometricInterpretation: Literal["MONOCHROME1", "MONOCHROME2"]
+    WindowCenter: Union[List[int], str]
+    WindowWidth: Union[List[int], str]
+    LossyImageCompression: Optional[str]
+
+    StudyDescription: str

@@ -1,56 +1,19 @@
 # Reader module
 #Author: Mateusz Kruk, Rafal Mozdzonek
 
+import json
 import logging
 import sys
-import json
-from typing import Dict
 from pathlib import Path
-from numpy.core.records import array
+from typing import Dict, Union, Tuple
+
 import numpy as np
+from numpy.core.records import array
 
-from converter.exceptions import InterfileInvalidValueException
-from converter.exceptions import InterfileInvalidHeaderException
-from models.metadata import InterfileHeader, MetaFile
-
+from converter.exceptions import InterfileInvalidHeaderException, InterfileInvalidValueException
+from models.metadata import InterfileHeader, CTMetaFile, PETMetaFile
 
 LOGGER = logging.getLogger(__name__)
-
-
-def recognize_type(bytes_per_pix, is_signed, is_float=False):
-    """
-        A function to recognize type of the data.
-
-        Arguments:
-        bytes_per_pix - How many bytes are used to encode one pixel. 
-        is_signed - Are signed other unsigned integers used.
-        is_float - currently not used
-
-        Returns:
-        - Numpy type
-    """
-    if is_signed:
-        if bytes_per_pix == 1:
-            return np.int8
-        elif bytes_per_pix == 2:
-            return np.int16
-        elif bytes_per_pix== 4:
-            return np.int32
-        elif bytes_per_pix == 8:
-            return np.int64
-        else:
-            raise ValueError('[ERROR] Invalid type declared!')
-    else:
-        if bytes_per_pix == 1:
-            return np.uint8
-        elif bytes_per_pix == 2:
-            return np.uint16
-        elif bytes_per_pix== 4:
-            return np.uint32
-        elif bytes_per_pix == 8:
-            return np.uint64
-        else:
-            raise ValueError('[ERROR] Invalid type declared!')
 
 
 def _read_interfile_header(path: Path) -> Dict:
@@ -81,6 +44,8 @@ def _read_interfile_header(path: Path) -> Dict:
             header = header.readlines()
 
             for line in header: #line e.g. "!key := value\n"
+
+                if line.isspace(): continue
 
                 # Stripping and splitting line from redundant symbols
                 key, value = line.strip('!\n').split(':=')
@@ -117,7 +82,7 @@ def _read_interfile_header(path: Path) -> Dict:
 
     except FileNotFoundError:
         LOGGER.error("File not found !")
-        raise InterfileInvalidHeaderException('header not found')
+        raise InterfileInvalidHeaderException(f'header not found: {path}')
 
 
 def interfile_header_import(path: Path) -> InterfileHeader:
@@ -145,7 +110,7 @@ def interfile_header_import(path: Path) -> InterfileHeader:
         quantification_units=int_dict['quantification units'],
     )
 
-def read_binary(obj: InterfileHeader) -> array:
+def read_binary(obj: InterfileHeader) -> Tuple[array, float, float, str]:
     """
         Reads image data from a binary file.
 
@@ -159,44 +124,52 @@ def read_binary(obj: InterfileHeader) -> array:
     byte_order_local = ""
 
     if "little" in obj.img_byte_order.lower():
-      byte_order_local = "little"
+        byte_order_local = "<"
     elif "big" in obj.img_byte_order.lower():
-      byte_order_local = "big"
+        byte_order_local = ">"
     elif "system" in obj.img_byte_order.lower():
-      byte_order_local = sys.byteorder
-      LOGGER.warn('Byte order was not specified. I will use system\'s default: ' + sys.byteorder)
-
-    values = []
-    total_pix = obj.matrix_size_1*obj.matrix_size_2*obj.matrix_size_3
-    # Opening the file
-    with open(obj.header_file_path + obj.img_file_name, "rb") as f:
-        byte_list = f.read()
-    if total_pix != len(byte_list) // obj.bytes_per_pixel:
-        raise IOError(
-            'Error: The given image dimensions and encoding does not match given data!'\
-            + '\n\t>\tTotal number of pixels declared: '+str(total_pix)\
-            + '\n\t>\tEstimation from file: '\
-            + str(len(byte_list) // obj.bytes_per_pixel)
+        byte_order_local = '<' if sys.byteorder == 'little' else '>'
+        LOGGER.warning(
+            'Byte order was not specified. I will use system\'s default: %s' % sys.byteorder
         )
 
-    for pix_no in range(0, total_pix):
-        values.append(
-            int.from_bytes(
-                byte_list[
-                    obj.bytes_per_pixel * pix_no : (obj.bytes_per_pixel * (pix_no + 1))
-                ], \
-                byteorder=byte_order_local,
-                signed="unsigned" not in obj.number_format
-            )
-    )
-    resh_arr = np.asarray(values).reshape(
-        (obj.matrix_size_3, obj.matrix_size_2, obj.matrix_size_1)
-    )
+    if 'float' in obj.number_format:
+        ttype = 'f'
+    elif 'short' in obj.number_format:
+        assert obj.bytes_per_pixel == 2
+        ttype = 'f'
+    elif 'long' in obj.number_format:
+        assert obj.bytes_per_pixel == 8
+        ttype = 'f'
+    elif "unsigned" in obj.number_format:
+        ttype = 'u'
+    elif "signed" in obj.number_format:
+        ttype = 'i'
+    else:
+        raise(Exception(f"Unsupported data format: {obj.number_format}"))
 
-    return resh_arr
+    data_type = byte_order_local + ttype + str(obj.bytes_per_pixel)
+
+    image_matrix = np.fromfile(obj.header_file_path + obj.img_file_name, dtype=data_type, count=-1)
+    resh_arr = image_matrix.reshape((obj.matrix_size_3, obj.matrix_size_2, obj.matrix_size_1))
+    # TODO: Understand why it is needed here
+    # Flip every slice of 3D image (Y and Z axes) to match reference test case.
+    resh_arr = resh_arr[::-1, ::-1, :]
+
+    rescale_intercept = 0
+    rescale_slope = 1
+
+    if 'float' in obj.number_format:
+        rescale_intercept = resh_arr.min()
+        rescale_slope = (resh_arr.max() - resh_arr.min())/np.iinfo(np.int16).max
+        resh_arr = (resh_arr - rescale_intercept)/rescale_slope
+
+        resh_arr = resh_arr.astype(np.uint16)
+
+    return resh_arr, rescale_slope, rescale_intercept, byte_order_local
 
 
-def read_json_meta(path: Path) -> MetaFile:
+def read_json_meta(path: Path, file_type: str) -> Union[CTMetaFile, PETMetaFile]:
     """
         Read additional meta data from a JSON file
 
@@ -208,4 +181,6 @@ def read_json_meta(path: Path) -> MetaFile:
     """
     with open(path, 'r') as f:
         data = json.load(f)
-        return MetaFile(**data)
+        if file_type == "CT":
+            return CTMetaFile(**data)
+        return PETMetaFile(**data)

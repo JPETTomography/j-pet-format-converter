@@ -1,37 +1,28 @@
 [![PyPI](https://img.shields.io/pypi/v/JPET-format-converter)](https://pypi.org/project/JPET-format-converter/)
 
 # j-pet-format-converter
-## version 2.0.2
-### Author: Rafał Masełek, Mateusz Kruk
-### Email: rafal.maselek@ncbj.gov.pl, mateusz64.kruk@student.uj.edu.pl
+## version 3.0.2
+### Author: Rafał Masełek, Mateusz Kruk, Rafał Możdżonek
+### Email: rafal.maselek@ncbj.gov.pl, mateusz64.kruk@student.uj.edu.pl rafal.mozdzonek@ncbj.gov.pl
 ### Modifications: Wojciech Krzemien 
 
-This script enables converting Interfile files to DICOM file format and importing meta-data from external file.
+This script enables converting Interfile files to DICOM file format and importing meta-data from external json file.
 
 ### Installation:
 **Prerequisites:**
-+ Python (vers. 3.X.X recommended)
-+ Numpy  (python library)
-+ pyDicom (python library)
-+ dicomgenerator
-+ setuptools >= 42
-+ wheel (python library)
++ Python (vers. 3.8.X or newer recommended)
++ Libraries from requirements.txt
 
 If you use Debian/Ubuntu/Linux Mint you can install python3 using 'apt-get install' command:
 ```
-sudo apt-get install python3 
-```
-
-To install a package, type following:
-```
-pip install JPET-format-converter
+sudo apt-get install python3
 ```
 
 To download the required modules, please run:
 ```
-pip install -r Requirements.txt
+pip install -r requirements.txt
 ```
-Where "Requirements.txt" is in the repository.
+Where "requirements.txt" is in the repository.
 
 ### Usage:
 Package provides an API for converting Interfile file into Dicom files. Interfile is specified by **two files**:
@@ -39,9 +30,9 @@ Package provides an API for converting Interfile file into Dicom files. Interfil
 + header file (.hdr), that has CASToRv3.1 keyset
 + image file (specified in the header)
 
-To convert a file/files using a command line, run the **converter.py** file, for example:
+To convert a file/files using a command line, run the **main.py** file, for example:
 ```
-python3 converter.py header.hdr -o dicom.dcm
+python3 main.py -i header.hdr -m metadata.json
 ```
 
 Using a ```--help``` flag will show all available commands.

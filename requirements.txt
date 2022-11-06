@@ -6,3 +6,4 @@ setuptools>=42
 wheel
 pytest==7.1.2
 pydantic==1.9.1
+lxml==4.9.2

@@ -30,11 +30,11 @@ def has_extension(l):
     return any([l.lower().endswith(e.lower()) for e in ext])
 
 def download_file(
-    out_folder,
+    input_folder,
     base_url='http://sphinx.if.uj.edu.pl/~rakoczy/FormatConverterTests/inputs'
 ):
     for url in [
-        f'{base_url}/dicoms/example_pt', f'{base_url}/dicoms/reference_pt', f'{base_url}/interfiles'
+        f'{base_url}/dicoms/reference_pt', f'{base_url}/interfiles'
     ]:
         print(url)
         session = requests.Session()
@@ -45,20 +45,20 @@ def download_file(
         links = get_links(session, url)
         lext = [l for l in links if has_extension(l)]
         for fext in lext:
-            folder = out_folder / basedir
+            folder = input_folder / basedir
             filepath = folder / fext
-            if Path(filepath).is_file():
-                print("File exists: " + str(filepath))
-            else:
-                print("File doesn't exist: " + str(filepath))
-                print("Downloading... " + f'{url}/{fext}')
+            # File doesn't exists, downlaoding
+            if not Path(filepath).is_file():
                 f = session.get(f'{url}/{fext}')
                 time.sleep(0.05)
                 Path(folder).mkdir(parents=True, exist_ok=True)
                 open(filepath, 'wb').write(f.content)
 
 @pytest.fixture
-def data_directory(pytestconfig):
-    out_folder = Path('tests/inputs')
-    download_file(out_folder=out_folder)
-    return out_folder
+def data_directory(temp_directory):
+    test_dir = Path(temp_directory)
+    input_folder = test_dir / 'inputs'
+    download_file(input_folder=input_folder)
+    return test_dir
+
+test_params = ['PT']

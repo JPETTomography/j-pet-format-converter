@@ -8,5 +8,3 @@ build/
 dist/
 JPET_format_converter.egg-info/
 examples/
-tests/inputs/dicoms/
-tests/inputs/interfiles/

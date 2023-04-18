@@ -15,6 +15,8 @@ from pytest import mark
 import converter.reader as rd
 from converter.exceptions import InterfileInvalidHeaderException
 
+from .conftest import test_params
+
 LOGGER = logging.getLogger(__name__)
 logging.basicConfig(
     format="%(levelname)-10s | %(filename)-20s | %(funcName)-15s | %(lineno)-5d | %(message)-50s\n"
@@ -24,7 +26,7 @@ LOGGER.setLevel(logging.DEBUG)
 
 class TestReader:
 
-    def test_interfile_header_import_ok(self, temp_directory):
+    def test_interfile_header_import_ok(self, data_directory):
         """
             Test if header import works
         """
@@ -42,7 +44,7 @@ class TestReader:
 
         #Header file path setup
 
-        p_cor = Path(temp_directory / "cor.hdr") #correct file
+        p_cor = data_directory / "cor.hdr" #correct file
 
         #Header file creation
 
@@ -62,7 +64,7 @@ class TestReader:
         assert res["number format"] == "short float", "ERROR! WRONG VALUE BINDED TO KEY"
 
 
-    def test_interfile_header_import_fail(self, temp_directory):
+    def test_interfile_header_import_fail(self, data_directory):
         """
             Test if header import works
         """
@@ -81,9 +83,9 @@ class TestReader:
 
         #Header file path setup
 
-        p_nofile = Path(temp_directory / "a") #no file
-        p_incor1 = Path(temp_directory / "incor1.hdr") #no starting tag
-        p_incor2 = Path(temp_directory / "incor2.hdr") #no ending tag
+        p_nofile = data_directory / "a" #no file
+        p_incor1 = data_directory / "incor1.hdr" #no starting tag
+        p_incor2 = data_directory / "incor2.hdr" #no ending tag
 
         #Header file creation
 
@@ -102,16 +104,20 @@ class TestReader:
             with pytest.raises(InterfileInvalidHeaderException):
                 rd._read_interfile_header(path=invalid)
 
-    @mark.parametrize("img_type", ["PT"])
+    @mark.dependency(
+            depends=["tests/test_writer.py::TestWriter::test_write_dicom_ct_ok[PT]"],
+            scope='session'
+    )
+    @mark.parametrize("img_type", test_params)
     def test_read_interfile_image(self, img_type, data_directory):
         img_type = img_type.lower()
 
-        test_dir = data_directory / Path(f"dicoms/example_{img_type}/")
+        test_dir = data_directory / f"outputs/example_{img_type}/"
         test_files = os.listdir(test_dir)
         test_slices = [pydicom.dcmread(os.path.join(test_dir, file)) for file in test_files]
         test_slices = sort_slices(test_slices)
 
-        reference_dir = data_directory / Path(f"dicoms/reference_{img_type}/")
+        reference_dir = data_directory / f"inputs/dicoms/reference_{img_type}/"
         reference_files = os.listdir(reference_dir)
         reference_slices = [
             pydicom.dcmread(os.path.join(reference_dir, file)) for file in reference_files

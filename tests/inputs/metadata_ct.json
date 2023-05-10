@@ -1,0 +1,15 @@
+{
+    "patient": {
+        "PatientID": "11111"
+    },
+    "patientCenter": [-349.31640625, -494.31640625, -446.5],
+    "ImageType": ["DERIVED", "PRIMARY", "AXIAL", "CT_SOM5 SPI"],
+    "ImageOrientationPatient": [1, 0, 0, 0, 1, 0],
+    "PhotometricInterpretation": "MONOCHROME2",
+    "PixelRepresentation": 0,
+    "WindowCenter": [40, 300],
+    "WindowWidth": [300, 1500],
+    "RescaleIntercept": "-1024.0",
+    "RescaleSlope": "1.0",
+    "LossyImageCompression": "01"
+}

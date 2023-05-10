@@ -1,19 +1,23 @@
 # Wrtier module
 #Author: Mateusz Kruk, Rafal Mozdzonek
 
-import os
+from datetime import datetime
 import logging
+import os
 from pathlib import Path
 import random
+from typing import Union
 
 from numpy.core.records import array
-from pydicom.dataset import Dataset
+from pydicom.dataset import Dataset, FileMetaDataset
+from pydicom.sequence import Sequence
 from pydicom.uid import generate_uid
 
-from converter.settings import UID
 from converter.exceptions import InterfileDataMissingException
-from converter.reader import read_binary, recognize_type
-from models.metadata import InterfileHeader, MetaFile, PatientData
+from converter.reader import read_binary
+from converter.settings import UID
+from models.metadata import InterfileHeader, CTMetaFile, PETMetaFile
+from models.metadata import PatientData, PetSeries
 
 
 LOGGER = logging.getLogger(__name__)
@@ -22,9 +26,9 @@ logging.basicConfig(
 )
 
 
-def rand_uid() -> str:
+def rand_uid(prefix: str=UID) -> str:
     return str(generate_uid(
-        prefix= UID,
+        prefix=prefix,
         entropy_srcs=[str(random.getrandbits(100))]
     ))
 
@@ -43,9 +47,15 @@ def add_from_interfile_header(obj: InterfileHeader, dataset: Dataset) -> Dataset
 
     dataset.Modality = obj.modality
 
+    dataset.PixelSpacing = [obj.scaling_factor_1, obj.scaling_factor_2]
+    dataset.SliceThickness = obj.scaling_factor_3
+
+    dataset.RescaleIntercept = obj.data_rescale_offset
+    dataset.RescaleSlope = obj.data_rescale_slope
+
     return dataset
 
-def add_from_json(obj: MetaFile, dataset: Dataset) -> Dataset:
+def add_from_json(obj: Union[CTMetaFile, PETMetaFile], dataset: Dataset) -> Dataset:
     """
         Writes json meta data to dicom dataset.
 
@@ -56,11 +66,21 @@ def add_from_json(obj: MetaFile, dataset: Dataset) -> Dataset:
         Returns:
         dataset - dicom dataset with inserted values
     """
-    tags = MetaFile.get_field_names()
+    tags = []
+    if dataset.Modality == "CT":
+        assert isinstance(obj, CTMetaFile)
+        tags = CTMetaFile.get_field_names()
+    if dataset.Modality == "PT":
+        assert isinstance(obj, PETMetaFile)
+        tags = PETMetaFile.get_field_names()
+
     tags = filter(lambda k: k[0].isupper(), tags)
 
     for tag in tags:
-        setattr(dataset, tag, obj[tag])
+        # Convert Tuple to List (for pydicom purposes)
+        val = list(obj[tag]) if isinstance(obj[tag], tuple) else obj[tag]
+        # Set DICOM Attribute
+        setattr(dataset, tag, val)
 
     patient_tags = PatientData.get_field_names()
     patient_tags = filter(lambda k: k[0].isupper(), patient_tags)
@@ -68,22 +88,39 @@ def add_from_json(obj: MetaFile, dataset: Dataset) -> Dataset:
     for patient_tag in patient_tags:
         setattr(dataset, patient_tag, obj.patient[patient_tag])
 
+    if isinstance(obj, PETMetaFile):
+        pet_series_tags = PetSeries.get_field_names()
+        pet_series_tags = filter(lambda k: k[0].isupper(), pet_series_tags)
+
+        for pet_series_tag in pet_series_tags:
+            setattr(dataset, pet_series_tag, obj.petSeries[pet_series_tag])
+
+        # TODO: Parse this from metafile
+        dataset.RadiopharmaceuticalInformationSequence = Sequence()
+        dataset.PatientOrientationCodeSequence = Sequence()
+        dataset.PatientGantryRelationshipCodeSequence = Sequence()
+
     return dataset
 
-def init_uuids(dataset: Dataset) -> Dataset:
-    # Generate random UUIDs
-    dataset.SOPInstanceUID = rand_uid()
-    dataset.StudyInstanceUID = rand_uid()
-    dataset.SeriesInstanceUID = rand_uid()
-    dataset.FrameOfReferenceUID = rand_uid()
+def add_dicom_metadata(dataset: Dataset) -> Dataset:
+    file_meta = FileMetaDataset()
+    """A Transfer Syntax is a set of encoding rules able to unambiguously represent one or more
+    Abstract Syntaxes. In particular, it allows communicating Application Entities to negotiate
+    common encoding techniques they both support (e.g., byte ordering, compression, etc.).
+    A Transfer Syntax is an attribute of a Presentation Context, one or more of which are
+    negotiated at the establishment of an Association between DICOM Application Entities."""
+    file_meta.TransferSyntaxUID = '1.2.840.10008.1.2.1' # Explicit VR Little Endian
+
+    file_meta.ImplementationVersionName = 'J-PET_V0'
+
+    dataset.file_meta = file_meta
 
     return dataset
-
 
 def interfile_image_to_dicom_dataset(
     obj: InterfileHeader,
     binary_img: array,
-    dataset: Dataset
+    dataset: Dataset,
 ) -> Dataset:
     """
         Read image file from header data and put it into a Dicom Dataset
@@ -105,9 +142,7 @@ def interfile_image_to_dicom_dataset(
             dataset.Columns = binary_img.shape[0]
             dataset.Rows = binary_img.shape[1]
 
-        dataset.PixelData = binary_img.astype(
-            recognize_type(obj.bytes_per_pixel, True)
-        ).tobytes()
+        dataset.PixelData = binary_img.tobytes()
 
         return dataset
 
@@ -119,12 +154,16 @@ def interfile_image_to_dicom_dataset(
 def create_slice_dataset(
     interfile_data: InterfileHeader,
     binary_img: array,
-    metadata: MetaFile,
-    extended_format: bool
+    metadata: Union[CTMetaFile, PETMetaFile],
+    slice_number=0,
+    number_of_slices=1,
+    extended_format: bool=False,
 ):
     ds = Dataset()
-    ds = init_uuids(ds)
     ds = add_from_interfile_header(obj=interfile_data, dataset=ds)
+    ds = add_dicom_metadata(ds)
+
+    ds.StudyDate = datetime.today().strftime("%Y%m%d")
 
     # Add image to the dataset
     ds = interfile_image_to_dicom_dataset(
@@ -136,19 +175,35 @@ def create_slice_dataset(
     if metadata:
         ds = add_from_json(obj=metadata, dataset=ds)
 
+    if not extended_format:
+        ds = set_slice_position(ds, metadata, slice_number, number_of_slices)
+
     return ds
 
-def correct_slice_position(dataset: Dataset, i: int):
-    slice_thickness = float(dataset.SliceThickness)
-    dataset.SliceLocation = dataset.ImagePositionPatient[2] - i*slice_thickness
-    dataset.ImagePositionPatient[2] -= i*slice_thickness
-    dataset.InstanceNumber = str(i+1)
+def set_slice_position(
+        dataset: Dataset,
+        metadata: Union[CTMetaFile, PETMetaFile],
+        slice_number: int,
+        number_of_slices: int
+):
+    pixel_spacing_x = float(dataset.PixelSpacing[0])
+    pixel_spacing_y = float(dataset.PixelSpacing[1])
+    pixel_spacing_z = float(dataset.SliceThickness)
+    patient_center = metadata.patientCenter
+
+    img_position_patient = [
+        -pixel_spacing_x*patient_center[0],
+        -pixel_spacing_y*patient_center[1],
+        pixel_spacing_z*(slice_number - patient_center[2])
+    ]
+
+    setattr(dataset, "ImagePositionPatient", img_position_patient)
 
     return dataset
 
 def write_dicom(
     interfile_data: InterfileHeader,
-    metadata: MetaFile,
+    metadata: Union[CTMetaFile, PETMetaFile],
     output_path: Path,
     extended_format: bool
 ) -> None:
@@ -161,7 +216,7 @@ def write_dicom(
         output_path - path to save output
         extended_format - should we use extended format (for 3D data)
     """
-    binary_img = read_binary(interfile_data)
+    binary_img, rescale_slope, rescale_intercept, byte_order_local = read_binary(interfile_data)
 
     if not extended_format:
         if not os.path.isdir(output_path):
@@ -169,37 +224,90 @@ def write_dicom(
 
         base_name = output_path.parts[-1]
 
-        slices_number = binary_img.shape[0]
-        for i in range(slices_number):
+        # Generate random UUIDs
+        SOPInstanceUID = rand_uid()
+        SOPClassUID = rand_uid()
+        StudyInstanceUID = rand_uid()
+        SeriesInstanceUID = rand_uid()
+        FrameOfReferenceUID = rand_uid()
+
+        study_time = datetime.today().strftime("%H%M%S.%f")
+
+        number_of_slices = binary_img.shape[0]
+        for i in range(number_of_slices):
             img_slice = binary_img[i, :, :].squeeze()
             ds = create_slice_dataset(
                 interfile_data=interfile_data,
                 binary_img=img_slice,
                 metadata=metadata,
-                extended_format=extended_format
+                extended_format=extended_format,
+                slice_number=i,
+                number_of_slices=number_of_slices
             )
 
-            ds = correct_slice_position(ds, i)
+            ds.InstanceNumber = str(i+1)
+            ds.NumberOfSlices = number_of_slices
+
+            if ds.Modality == "PT":
+                ds.ImageIndex = i+1
+
+            ds.RescaleSlope = rescale_slope
+            ds.RescaleIntercept = rescale_intercept
+
+            if rescale_slope != 1:
+                ds.BitsAllocated = 16
+                ds.BitsStored = 16
+                ds.HighBit = 15
+                ds.PixelRepresentation = 0 # unsigned int
+            else:
+                ds.BitsAllocated = 8*interfile_data.bytes_per_pixel
+                ds.BitsStored = 8*interfile_data.bytes_per_pixel
+                ds.HighBit = 8*interfile_data.bytes_per_pixel - 1
+                if "unsigned" in interfile_data.number_format:
+                    ds.PixelRepresentation = 0 # unsigned int
+                else:
+                    ds.PixelRepresentation = 1 # signed int
+
+            # Only monochromatic images (one channel per pixel)
+            ds.SamplesPerPixel = 1
+
+            ds.StudyDate = datetime.today().strftime("%Y%m%d")
+            ds.StudyTime = study_time
+
+            # Assing folder level UUIDs and other data
+            ds.SOPInstanceUID = SOPInstanceUID
+            ds.SOPClassUID = SOPClassUID
+            ds.StudyInstanceUID = StudyInstanceUID
+            ds.SeriesInstanceUID = SeriesInstanceUID
+            ds.FrameOfReferenceUID = FrameOfReferenceUID
+
+            # TODO: Implement our own Implementation Class UID
 
             # Set most common options (most common encoding)
-            ds.is_little_endian = True
+            ds.is_little_endian = '<' in byte_order_local
             ds.is_implicit_VR = False
 
+            ds.fix_meta_info()
+
             # Save file
-            ds.save_as(f'{str(output_path)}/{base_name}_{i}.dcm')
+            ds.save_as(f'{str(output_path)}/{base_name}_{i}.dcm', write_like_original=False)
+
+    # TODO: Fix it!
     else:
         ds = create_slice_dataset(
             interfile_data=interfile_data,
             binary_img=binary_img,
             metadata=metadata,
-            extended_format=extended_format
+            extended_format=extended_format,
         )
 
         # Set most common options (most common encoding)
-        ds.is_little_endian = True
+        ds.is_little_endian = True if '<' in byte_order_local else False
         ds.is_implicit_VR = False
 
-        # Save file
-        ds.save_as(str(output_path))
+        ds.fix_meta_info()
 
-    LOGGER.info('Writing image is complete!')
+        # Save file
+        ds.save_as(str(output_path), write_like_original=False)
+
+    LOGGER.info('Writing completed!')

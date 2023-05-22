@@ -1,0 +1,10 @@
+__pycache__/
+.*/
+.*
+
+venv/
+pyenv/
+build/
+dist/
+JPET_format_converter.egg-info/
+examples/

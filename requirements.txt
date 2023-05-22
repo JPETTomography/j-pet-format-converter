@@ -2,3 +2,10 @@ numpy
 pyDicom
 pylint
 python-coveralls
+setuptools>=42
+wheel
+pytest==7.1.2
+pytest-order==1.1.0
+pytest-dependency==0.5.1
+pydantic==1.9.1
+lxml==4.9.2

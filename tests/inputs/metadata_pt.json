@@ -1,0 +1,75 @@
+{
+    "patient": {
+        "PatientID": "11111",
+        "PatientName": "Test Patient",
+        "PatientBirthDate": "18581118",
+        "PatientSex": "O",
+        "PatientAge": "163Y",
+        "PatientWeight": "5.0",
+        "PatientPosition": "HFS"
+    },
+    "petSeries": {
+        "SeriesDate": "20220316",
+        "SeriesTime": "151524.000000",
+        "CollimatorType": "NONE",
+        "CorrectedImage": ["NORM", "DTIM", "ATTN", "SCAT", "DECY", "RAN", "BEDR"],
+        "SeriesType": ["WHOLE BODY", "IMAGE"],
+        "Units": "BQML",
+        "CountsSource": "EMISSION",
+        "DecayCorrection": "START",
+        "SeriesDescription": "Test Series Description"
+    },
+    "petIsotope": {
+        "RadiopharmaceuticalInformationSequence": [
+            {
+                "RadionuclideCodeSequence": [
+                    {
+                        "CodeValue": "C-131A3",
+                        "CodingSchemeDesignator": "SRT",
+                        "CodeMeaning": "^68^Gallium",
+                        "MappingResource": "DCMR",
+                        "ContextGroupVersion": "20070625000000.000000"
+                    }
+                ]
+            }
+        ]
+    },
+    "petPatientOrientation": {
+        "PatientOrientationCodeSequence": [
+            {
+                "CodeValue": "F-10450",
+                "CodingSchemeDesignator": "99SDM",
+                "CodeMeaning": "recumbent",
+                "MappingResource": "DCMR",
+                "ContextGroupVersion": "20020904000000.000000",
+                "PatientOrientationModifierCodeSequence": [
+                    {
+                        "CodeValue": "F-10340",
+                        "CodingSchemeDesignator": "99SDM",
+                        "CodeMeaning": "supine",
+                        "MappingResource": "DCMR",
+                        "ContextGroupVersion": "20020904000000.000000"
+                    }
+                ]
+            }
+        ],
+        "PatientGantryRelationshipCodeSequence": [
+            {
+                "CodeValue": "F-10470",
+                "CodingSchemeDesignator": "99SDM",
+                "CodeMeaning": "headfirst",
+                "MappingResource": "DCMR",
+                "ContextGroupVersion": "20020904000000.000000"
+            }
+        ]
+    },
+    "patientCenter": [85, 115, 164],
+    "ImageType": ["ORIGINAL", "PRIMARY"],
+    "FrameReferenceTime": "149359.42897627",
+    "DecayFactor": "1.02584",
+    "ImageOrientationPatient": [1, 0, 0, 0, 1, 0],
+    "PhotometricInterpretation": "MONOCHROME2",
+    "WindowCenter": [1346],
+    "WindowWidth": [2422],
+    "StudyDescription": "Test Study Description"
+}
